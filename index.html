@@ -10,8 +10,9 @@
             --primary: #6366f1;
             --bg: #f8fafc;
             --text: #0f172a;
-            --particle-color: rgba(99, 102, 241, 0.4);
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --line-color: rgba(99, 102, 241, 0.15);
+            --particle-color: rgba(99, 102, 241, 0.6);
+            --card-bg: rgba(255, 255, 255, 0.85);
             --border: rgba(0, 0, 0, 0.1);
         }
 
@@ -19,8 +20,9 @@
             --bg: #05070a;
             --text: #f1f5f9;
             --primary: #818cf8;
-            --particle-color: rgba(129, 140, 248, 0.5);
-            --card-bg: rgba(15, 23, 42, 0.8);
+            --line-color: rgba(129, 140, 248, 0.2);
+            --particle-color: rgba(129, 140, 248, 0.8);
+            --card-bg: rgba(15, 23, 42, 0.85);
             --border: rgba(255, 255, 255, 0.1);
         }
 
@@ -30,50 +32,30 @@
             font-family: 'Exo 2', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.4s ease, color 0.4s ease;
+            transition: background 0.5s ease;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
         #particle-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
-            pointer-events: none;
         }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; }
-
-        /* Navigation */
+        
         nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0; }
         .logo { font-weight: 800; font-size: 1.8rem; color: var(--primary); letter-spacing: -1px; }
 
-        /* Hero */
-        .hero { padding: 100px 0 60px; text-align: center; }
+        .hero { padding: 80px 0; text-align: center; }
         .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; margin-bottom: 20px; }
-        
-        /* Interactive Elements */
-        .theme-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-family: 'Exo 2';
-            font-weight: 600;
-            transition: 0.3s;
-        }
 
         .btn {
-            padding: 18px 36px;
-            border-radius: 14px;
-            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
             font-weight: 800;
-            display: inline-block;
             transition: 0.3s;
             border: none;
             cursor: pointer;
@@ -82,26 +64,17 @@
             color: #fff;
         }
 
-        /* Glass Cards */
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin: 60px 0; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin: 40px 0; }
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 35px;
+            padding: 30px;
             transition: 0.3s;
         }
-        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
 
-        footer { 
-            padding: 60px 0; 
-            text-align: center; 
-            border-top: 1px solid var(--border); 
-            font-size: 0.8rem; 
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
+        footer { padding: 40px 0; text-align: center; border-top: 1px solid var(--border); font-size: 0.8rem; font-weight: 600; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -111,33 +84,31 @@
     <div class="container">
         <nav>
             <div class="logo">BOOKFAIR.COM</div>
-            <button class="theme-btn" onclick="toggleTheme()">DARK/LIGHT MODE</button>
+            <button class="btn" onclick="toggleTheme()" style="background: var(--card-bg); color: var(--text); border: 1px solid var(--border);">THEME SHIFT</button>
         </nav>
 
         <header class="hero">
-            <h1>India's Leading <br><span style="color: var(--primary)">Intercommunity Marketplace</span></h1>
-            <p style="margin: 20px 0 40px; font-size: 1.2rem; opacity: 0.8;">Buy second hand books and sell old books online at best prices. [cite: 5]</p>
-            <button class="btn">POST A FREE AD</button>
+            <h1>Intercommunity <br><span style="color: var(--primary)">Marketplace</span></h1>
+            <p style="margin: 20px 0 40px; font-size: 1.1rem; opacity: 0.8;">Buy second hand books or sell old books online at best prices[cite: 5, 15].</p>
         </header>
 
         <div class="book-grid">
             <div class="glass-card">
-                <h3 style="margin-bottom: 10px;">Indian Art and Culture</h3>
-                <p style="font-size: 0.9rem; opacity: 0.7;">ISBN 9789353168193 </p>
-                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹630</div>
-                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 12px;">INITIATE BUY NOW</button>
+                <h3>Indian Art and Culture</h3>
+                <p style="opacity: 0.7; font-size: 0.9rem;">ISBN 9789353168193 [cite: 167]</p>
+                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹630 [cite: 115]</div>
+                <button class="btn" style="width: 100%;">BUY NOW </button>
             </div>
-
             <div class="glass-card">
-                <h3 style="margin-bottom: 10px;">History Book Children</h3>
-                <p style="font-size: 0.9rem; opacity: 0.7;">Posted by Joy Das [cite: 168]</p>
-                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹700</div>
-                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 12px;">INITIATE BUY NOW</button>
+                <h3>History Book Children</h3>
+                <p style="opacity: 0.7; font-size: 0.9rem;">Seller: Joy Das [cite: 140]</p>
+                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹700 [cite: 177]</div>
+                <button class="btn" style="width: 100%;">BUY NOW </button>
             </div>
         </div>
 
         <footer>
-            COPYRIGHT © 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS 
+            COPYRIGHT © 2026 BOOKFAIR | Alekhyo Biswas, Joy Das [cite: 64, 215]
         </footer>
     </div>
 
@@ -145,7 +116,16 @@
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let particleColor = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
+        let isAssembled = false;
+        let cycleTimer = 0;
+
+        function getColors() {
+            const style = getComputedStyle(document.documentElement);
+            return {
+                dot: style.getPropertyValue('--particle-color'),
+                line: style.getPropertyValue('--line-color')
+            };
+        }
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -154,39 +134,98 @@
 
         class Particle {
             constructor() {
+                this.reset();
+            }
+            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
+                // Target position (for book outline)
+                this.tx = this.x;
+                this.ty = this.y;
+                this.size = Math.random() * 3 + 2; // Bigger dots
+                this.vx = Math.random() * 0.4 - 0.2;
+                this.vy = Math.random() * 0.4 - 0.2;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
+                if (isAssembled) {
+                    // Gravitate toward target
+                    this.x += (this.tx - this.x) * 0.05;
+                    this.y += (this.ty - this.y) * 0.05;
+                } else {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+                
+                // Wrap around edges
                 if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
+                if (this.x > canvas.width) this.x = 0;
                 if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
             }
-            draw() {
-                ctx.fillStyle = particleColor;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        }
+
+        function createBookOutline() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const w = 180, h = 240; // Book dimensions
+            
+            particles.forEach((p, i) => {
+                if (i < 150) { // Only use first 150 particles for the shape
+                    const side = i % 4;
+                    const pos = Math.random();
+                    if (side === 0) { p.tx = centerX - w/2 + (w * pos); p.ty = centerY - h/2; } // Top
+                    else if (side === 1) { p.tx = centerX + w/2; p.ty = centerY - h/2 + (h * pos); } // Right
+                    else if (side === 2) { p.tx = centerX - w/2 + (w * pos); p.ty = centerY + h/2; } // Bottom
+                    else { p.tx = centerX - w/2; p.ty = centerY - h/2 + (h * pos); } // Left
+                } else {
+                    // Random wander for others
+                    p.tx = Math.random() * canvas.width;
+                    p.ty = Math.random() * canvas.height;
+                }
+            });
         }
 
         function init() {
             particles = [];
-            for (let i = 0; i < 80; i++) particles.push(new Particle());
+            for (let i = 0; i < 200; i++) particles.push(new Particle());
         }
 
         function animate() {
+            const colors = getColors();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            cycleTimer++;
+            if (cycleTimer % 400 === 0) {
+                isAssembled = !isAssembled;
+                if (isAssembled) createBookOutline();
+            }
+
+            // Draw Lines
+            ctx.strokeStyle = colors.line;
+            ctx.lineWidth = 0.8;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw Dots
+            ctx.fillStyle = colors.dot;
             particles.forEach(p => {
                 p.update();
-                p.draw();
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
             });
+
             requestAnimationFrame(animate);
         }
 
@@ -194,11 +233,6 @@
             const root = document.documentElement;
             const isDark = root.getAttribute('data-theme') === 'dark';
             root.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            
-            // Sync particle colors with theme
-            setTimeout(() => {
-                particleColor = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
-            }, 100);
         }
 
         window.addEventListener('resize', resize);
