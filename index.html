@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookfair | Buy and Sell Old Books Online</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f4f4; }
+        body { font-family: sans-serif; margin: 0; line-height: 1.6; color: #333; }
+        header { background: var(--primary); color: white; padding: 1rem; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .hero { background: #e8f5e9; padding: 4rem 2rem; text-align: center; }
+        .btn { padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-buy { background: var(--secondary); color: white; }
+        .btn-sell { background: #2980b9; color: white; }
+        .container { max-width: 1200px; margin: auto; padding: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center; }
+        .steps { display: flex; justify-content: space-around; background: #fff; padding: 2rem 0; }
+        footer { background: #333; color: white; padding: 2rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <div class="logo"><strong>Bookfair</strong> & More</div>
+            <div class="search-bar">
+                <input type="text" placeholder="So, what are you searching for today?">
+                <button>Search</button>
+            </div>
+            <div class="user-menu">
+                <a href="#" style="color:white">My Account</a> | <a href="#" style="color:white">Cart</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Buy and Sell Old Books Online in India!</h1>
+        <p>Convert your used books into real money.</p>
+        <div style="margin-top: 20px;">
+            <a href="#" class="btn btn-buy">Buy / Rent / Exchange</a>
+            <a href="#" class="btn btn-sell">Sell / Donate Book</a>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 style="text-align:center">Earn Money in 3 Simple Steps</h2>
+        <div class="steps">
+            <div><h3>1</h3><p>Post an Ad</p></div>
+            <div><h3>2</h3><p>Set Your Price</p></div>
+            <div><h3>3</h3><p>Get Paid</p></div>
+        </div>
+    </section>
+
+    <main class="container">
+        <h2>Newly Added Books</h2>
+        <div class="grid">
+            <div class="card">
+                <div style="height:150px; background:#ccc; margin-bottom:10px;">Book Image</div>
+                <h3>History Book Children</h3>
+                <p>Condition: Excellent</p>
+                <p><strong>Price: ₹630</strong> <span style="text-decoration:line-through; color:gray">₹1200</span></p>
+                <button class="btn-buy" style="border:none; cursor:pointer">BUY NOW</button>
+            </div>
+            </div>
+    </main>
+
+    <footer>
+        <div class="container grid">
+            <div>
+                <h4>About Us</h4>
+                <p>India's leading platform for second-hand books.</p>
+            </div>
+            <div>
+                <h4>Useful Links</h4>
+                <ul style="list-style:none; padding:0;">
+                    <li><a href="#" style="color:#bbb">How it works?</a></li>
+                    <li><a href="#" style="color:#bbb">Terms of Use</a></li>
+                    <li><a href="#" style="color:#bbb">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Stay Connected</h4>
+                <p>Support: support@Bookfair.com</p>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:2rem; border-top:1px solid #555; padding-top:1rem;">
+            Copyright © 2023, Bookfair™ All Rights Reserved [cite: 64]
+        </div>
+    </footer>
+
+</body>
+</html>
