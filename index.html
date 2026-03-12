@@ -8,22 +8,19 @@
     <style>
         :root {
             --primary: #6366f1;
-            --bg: #f8fafc;
-            --text: #0f172a;
-            --particle-color: 99, 102, 241;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --border: rgba(0, 0, 0, 0.15);
-            --shadow: rgba(0, 0, 0, 0.1);
+            --bg: #fdfdfd;
+            --text: #050505;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --border: rgba(0, 0, 0, 0.2);
+            --hue: 240; /* Starting color hue (Indigo) */
         }
 
         [data-theme="dark"] {
-            --bg: #05070a;
+            --bg: #030407;
             --text: #ffffff;
-            --primary: #818cf8;
-            --particle-color: 129, 140, 248;
-            --card-bg: rgba(10, 15, 25, 0.95);
-            --border: rgba(255, 255, 255, 0.1);
-            --shadow: rgba(0, 0, 0, 0.5);
+            --primary: #a855f7;
+            --card-bg: rgba(8, 10, 15, 0.98);
+            --border: rgba(255, 255, 255, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,10 +29,11 @@
             font-family: 'Exo 2', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.4s ease;
+            transition: background 0.5s ease;
             overflow-x: hidden;
         }
 
+        /* --- THE MULTICOLOR ENGINE --- */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -44,97 +42,85 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
+            opacity: 0.8;
         }
 
+        /* --- UI CONTROLS --- */
         .content-layer { position: relative; z-index: 10; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-
-        /* Navigation */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0; }
-        .logo { font-weight: 900; font-size: 2rem; color: var(--primary); letter-spacing: -1px; }
+        .logo { font-weight: 900; font-size: 2.2rem; color: var(--primary); text-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
 
-        /* Hero - High Contrast */
-        .hero { padding: 80px 0; text-align: center; }
+        /* --- HERO: MAXIMUM VISIBILITY --- */
+        .hero { padding: 60px 0; text-align: center; }
         .hero h1 { 
-            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            font-size: clamp(3rem, 10vw, 5rem); 
             font-weight: 900; 
-            margin-bottom: 25px;
-            text-shadow: 0 4px 10px var(--shadow);
+            line-height: 0.9;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
         }
         .hero p { 
-            font-size: 1.3rem; 
-            font-weight: 600;
-            max-width: 800px; 
-            margin: 0 auto 40px; 
-            background: var(--card-bg);
+            font-size: 1.4rem; 
+            font-weight: 700;
+            background: var(--text);
+            color: var(--bg);
             display: inline-block;
-            padding: 5px 15px;
-            border-radius: 8px;
+            padding: 8px 20px;
+            transform: skewX(-10deg);
         }
 
-        /* Improved Description Boxes (Cards) */
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 35px; margin-bottom: 80px; }
+        /* --- DESCRIPTION BOXES: SOLID FRONT --- */
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; margin-bottom: 80px; }
         
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            border: 2px solid var(--border);
-            border-radius: 28px;
-            padding: 40px;
-            box-shadow: 0 20px 40px var(--shadow);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid var(--border); /* Thicker border for front-facing focus */
+            border-radius: 0px; /* Brute-futurism look */
+            padding: 45px;
+            box-shadow: 15px 15px 0px var(--primary); /* Hard shadow for "pop" */
+            transition: 0.3s ease;
         }
 
-        .glass-card:hover { transform: translateY(-12px); border-color: var(--primary); }
+        .glass-card:hover { transform: translate(-5px, -5px); box-shadow: 20px 20px 0px var(--primary); }
 
-        .glass-card h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 12px; }
-        
-        .label { font-weight: 700; color: var(--primary); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .label { font-weight: 900; color: var(--primary); font-size: 0.9rem; margin-bottom: 10px; display: block; }
+        .glass-card h3 { font-size: 1.8rem; font-weight: 900; line-height: 1.2; margin-bottom: 10px; }
 
-        .price-tag { 
-            font-size: 2.2rem; 
-            font-weight: 900; 
-            margin: 20px 0; 
-            color: var(--text);
-            display: flex;
-            align-items: center;
-        }
+        .price-tag { font-size: 2.5rem; font-weight: 900; color: var(--text); margin: 15px 0; }
 
         .btn {
             width: 100%;
-            padding: 20px;
-            border-radius: 16px;
+            padding: 22px;
             font-weight: 900;
-            font-family: 'Exo 2';
+            font-size: 1.1rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
             cursor: pointer;
             border: none;
-            background: var(--primary);
-            color: white;
-            transition: 0.3s;
-        }
-
-        .btn:hover { filter: brightness(1.2); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); }
-
-        .theme-btn {
             background: var(--text);
             color: var(--bg);
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 800;
+            transition: 0.2s;
+        }
+
+        .btn:hover { background: var(--primary); color: white; }
+
+        .theme-btn {
+            background: var(--primary);
+            color: white;
+            padding: 15px 30px;
+            font-weight: 900;
             border: none;
             cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
         }
 
         footer { 
-            padding: 60px 0; 
+            padding: 80px 0; 
             text-align: center; 
             font-weight: 900; 
-            letter-spacing: 2px;
-            opacity: 0.8;
-            border-top: 2px solid var(--border);
+            background: var(--text);
+            color: var(--bg);
         }
     </style>
 </head>
@@ -146,36 +132,40 @@
         <div class="container">
             <nav>
                 <div class="logo">BOOKFAIR.COM</div>
-                <button class="theme-btn" onclick="toggleTheme()">TOGGLE THEME</button>
+                <button class="theme-btn" onclick="toggleTheme()">SWITCH MODE</button>
             </nav>
 
             <header class="hero">
-                <h1>REVOLUTIONIZING<br><span style="color: var(--primary)">BOOK RE-COMMERCE.</span></h1>
-                <p>Buy, sell, rent, or exchange second-hand books at the best prices[cite: 5, 8, 9].</p>
+                <h1>BUY. SELL.<br><span style="color: var(--primary)">EXCHANGE.</span></h1>
+                <p>India's leading online intercommunity marketplace.</p>
             </header>
 
             <div class="book-grid">
                 <div class="glass-card">
-                    <span class="label">UPSC / Civil Services</span>
+                    <span class="label">UPSC / ART & CULTURE</span>
                     <h3>Indian Art and Culture</h3>
-                    <p style="font-weight: 700; opacity: 0.8;">Author: Nitin Singhania </p>
+                    <p style="font-weight: 700;">Nitin Singhania [cite: 167, 171]</p>
                     <div class="price-tag">₹630</div>
-                    <p style="margin-bottom: 25px; font-weight: 600;">Condition: Excellent </p>
-                    <button class="btn">Initiate Buy Now [cite: 315]</button>
+                    <p style="margin-bottom: 25px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;">
+                        Condition: Excellent 
+                    </p>
+                    <button class="btn">Initiate Buy Now [cite: 127]</button>
                 </div>
 
                 <div class="glass-card">
-                    <span class="label">Children's Education</span>
+                    <span class="label">READING / HISTORY</span>
                     <h3>History Book Children</h3>
-                    <p style="font-weight: 700; opacity: 0.8;">Seller: Joy Das [cite: 168]</p>
+                    <p style="font-weight: 700;">Seller: Joy Das [cite: 140, 159]</p>
                     <div class="price-tag">₹700</div>
-                    <p style="margin-bottom: 25px; font-weight: 600;">Ad ID: 3461673796514383 [cite: 165]</p>
-                    <button class="btn">Initiate Buy Now [cite: 315]</button>
+                    <p style="margin-bottom: 25px; font-weight: 700; border-top: 1px solid var(--border); padding-top: 10px;">
+                        ID: 3461673796514383 [cite: 165]
+                    </p>
+                    <button class="btn">Initiate Buy Now [cite: 127]</button>
                 </div>
             </div>
 
             <footer>
-                COPYRIGHT © 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS [cite: 215]
+                COPYRIGHT © 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS 
             </footer>
         </div>
     </div>
@@ -184,12 +174,7 @@
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let connectionDist = 150;
-
-        function getParticleColor() {
-            const rgb = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
-            return rgb.trim();
-        }
+        let hue = 240;
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -198,22 +183,26 @@
 
         class Particle {
             constructor() {
+                this.reset();
+            }
+            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 4 + 2; // Bigger dots
-                this.speedX = Math.random() * 0.8 - 0.4;
-                this.speedY = Math.random() * 0.8 - 0.4;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                // Assign each particle a slightly different hue
+                this.colorHue = (hue + Math.random() * 60 - 30) % 360;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
-                else if (this.x < 0) this.x = canvas.width;
-                if (this.y > canvas.height) this.y = 0;
-                else if (this.y < 0) this.y = canvas.height;
+                if (this.x > canvas.width || this.x < 0 || this.y > canvas.height || this.y < 0) {
+                    this.reset();
+                }
             }
             draw() {
-                ctx.fillStyle = `rgb(${getParticleColor()})`;
+                ctx.fillStyle = `hsla(${this.colorHue}, 70%, 60%, 0.8)`;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -222,21 +211,20 @@
 
         function init() {
             particles = [];
-            const count = (canvas.width * canvas.height) / 15000;
-            for (let i = 0; i < count; i++) particles.push(new Particle());
+            for (let i = 0; i < 70; i++) particles.push(new Particle());
         }
 
         function drawLines() {
-            const color = getParticleColor();
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < connectionDist) {
-                        ctx.strokeStyle = `rgba(${color}, ${1 - dist/connectionDist})`;
-                        ctx.lineWidth = 1;
+                    if (dist < 150) {
+                        // Lines take a gradient color between the two connected dots
+                        ctx.strokeStyle = `hsla(${particles[i].colorHue}, 70%, 50%, ${1 - dist/150})`;
+                        ctx.lineWidth = 2;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -248,6 +236,8 @@
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Slowly shift the base hue for a dynamic feel
+            hue += 0.2; 
             particles.forEach(p => {
                 p.update();
                 p.draw();
@@ -262,10 +252,8 @@
             root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        window.addEventListener('resize', () => { resize(); init(); });
-        resize();
-        init();
-        animate();
+        window.addEventListener('resize', resize);
+        resize(); init(); animate();
     </script>
 </body>
 </html>
