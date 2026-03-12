@@ -3,92 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookfair | Buy and Sell Old Books Online</title>
+    <title>Bookfair | Future of Exchange</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f4f4; }
-        body { font-family: sans-serif; margin: 0; line-height: 1.6; color: #333; }
-        header { background: var(--primary); color: white; padding: 1rem; }
-        nav { display: flex; justify-content: space-between; align-items: center; }
-        .hero { background: #e8f5e9; padding: 4rem 2rem; text-align: center; }
-        .btn { padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; }
-        .btn-buy { background: var(--secondary); color: white; }
-        .btn-sell { background: #2980b9; color: white; }
-        .container { max-width: 1200px; margin: auto; padding: 2rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; text-align: center; }
-        .steps { display: flex; justify-content: space-around; background: #fff; padding: 2rem 0; }
-        footer { background: #333; color: white; padding: 2rem; margin-top: 2rem; }
+        :root {
+            --primary: #6366f1; /* Modern Indigo */
+            --secondary: #10b981; /* Emerald */
+            --bg: #ffffff;
+            --text: #1f2937;
+            --card-bg: #f9fafb;
+            --accent: #8b5cf6;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --text: #f8fafc;
+            --card-bg: #1e293b;
+            --primary: #818cf8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        h1, h2, .logo { font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+        }
+
+        .logo { font-size: 1.5rem; color: var(--primary); }
+
+        .nav-controls { display: flex; align-items: center; gap: 15px; }
+
+        /* Dark Mode Toggle Switch */
+        .theme-switch {
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Hero Section with Glassmorphism */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent);
+        }
+
+        .hero h1 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
+        
+        .cta-group { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            margin-top: 30px; 
+            flex-wrap: wrap; 
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6); }
+
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(128, 128, 128, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover { transform: scale(1.02); border-color: var(--primary); }
+
+        .price-tag { color: var(--secondary); font-weight: 700; font-size: 1.2rem; display: block; margin: 10px 0; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            nav { flex-direction: column; gap: 15px; }
+            .grid { grid-template-columns: 1fr; }
+            .cta-group { flex-direction: column; width: 100%; }
+            .btn { width: 100%; text-align: center; }
+        }
+
+        footer { 
+            margin-top: 100px; 
+            padding: 50px 0; 
+            background: var(--card-bg); 
+            text-align: center;
+            border-top: 1px solid rgba(128, 128, 128, 0.1);
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <nav class="container">
-            <div class="logo"><strong>Bookfair</strong> & More</div>
-            <div class="search-bar">
-                <input type="text" placeholder="So, what are you searching for today?">
-                <button>Search</button>
-            </div>
-            <div class="user-menu">
-                <a href="#" style="color:white">My Account</a> | <a href="#" style="color:white">Cart</a>
+    <div class="container">
+        <nav>
+            <div class="logo">BOOKFAIR.IO</div>
+            <div class="nav-controls">
+                <button class="theme-switch" onclick="toggleTheme()">MODE: LIGHT</button>
+                <a href="#" style="color: var(--text); text-decoration: none; font-weight: 600;">Login</a>
             </div>
         </nav>
-    </header>
+    </div>
 
-    <section class="hero">
-        <h1>Buy and Sell Old Books Online in India!</h1>
-        <p>Convert your used books into real money.</p>
-        <div style="margin-top: 20px;">
-            <a href="#" class="btn btn-buy">Buy / Rent / Exchange</a>
-            <a href="#" class="btn btn-sell">Sell / Donate Book</a>
-        </div>
-    </section>
-
-    <section class="container">
-        <h2 style="text-align:center">Earn Money in 3 Simple Steps</h2>
-        <div class="steps">
-            <div><h3>1</h3><p>Post an Ad</p></div>
-            <div><h3>2</h3><p>Set Your Price</p></div>
-            <div><h3>3</h3><p>Get Paid</p></div>
+    <section class="hero container">
+        <h1>RECODE YOUR LIBRARY.<br><span style="color: var(--primary)">CONVERT BOOKS TO CASH.</span></h1>
+        <p>India's leading intercommunity marketplace for new and used books[cite: 12, 15].</p>
+        
+        <div class="cta-group">
+            <button class="btn btn-primary">BUY / RENT / EXCHANGE [cite: 8]</button>
+            <button class="btn btn-outline">SELL / DONATE [cite: 9]</button>
         </div>
     </section>
 
     <main class="container">
-        <h2>Newly Added Books</h2>
+        <h2 style="font-size: 1rem; border-left: 4px solid var(--primary); padding-left: 15px;">Newly Discovered</h2>
         <div class="grid">
             <div class="card">
-                <div style="height:150px; background:#ccc; margin-bottom:10px;">Book Image</div>
-                <h3>History Book Children</h3>
-                <p>Condition: Excellent</p>
-                <p><strong>Price: ₹630</strong> <span style="text-decoration:line-through; color:gray">₹1200</span></p>
-                <button class="btn-buy" style="border:none; cursor:pointer">BUY NOW</button>
+                <div style="height: 180px; background: linear-gradient(45deg, #1e293b, #334155); border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Orbitron';">BOOK_IMG_01</div>
+                <h3>History: Children [cite: 72]</h3>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Seller: Joy Das | Pin: 700104 [cite: 168]</p>
+                <span class="price-tag">₹630.00 [cite: 115]</span>
+                <button class="btn btn-primary" style="width: 100%; padding: 10px;">PROCURE ITEM</button>
             </div>
+            
+            <div class="card">
+                <div style="height: 180px; background: linear-gradient(45deg, #4338ca, #6366f1); border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Orbitron';">BOOK_IMG_02</div>
+                <h3>Art & Culture [cite: 170]</h3>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Author: Nitin Singhania [cite: 171]</p>
+                <span class="price-tag">₹700.00 [cite: 177]</span>
+                <button class="btn btn-primary" style="width: 100%; padding: 10px;">PROCURE ITEM</button>
             </div>
+        </div>
     </main>
 
     <footer>
-        <div class="container grid">
-            <div>
-                <h4>About Us</h4>
-                <p>India's leading platform for second-hand books.</p>
-            </div>
-            <div>
-                <h4>Useful Links</h4>
-                <ul style="list-style:none; padding:0;">
-                    <li><a href="#" style="color:#bbb">How it works?</a></li>
-                    <li><a href="#" style="color:#bbb">Terms of Use</a></li>
-                    <li><a href="#" style="color:#bbb">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Stay Connected</h4>
-                <p>Support: support@Bookfair.com</p>
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:2rem; border-top:1px solid #555; padding-top:1rem;">
-            Copyright © 2023, Bookfair™ All Rights Reserved [cite: 64]
+        <div class="container">
+            <p style="font-family: 'Orbitron'; font-size: 0.8rem;">&copy; 2026 BOOKFAIR [cite: 64] | SECURE TRANSACTIONS [cite: 56]</p>
+            <p style="font-size: 0.7rem; opacity: 0.5; margin-top: 10px;">Operated by Boolean Infotech Solutions [cite: 215]</p>
         </div>
     </footer>
 
+    <script>
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.querySelector('.theme-switch');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.innerText = 'MODE: LIGHT';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.innerText = 'MODE: DARK';
+            }
+        }
+    </script>
 </body>
 </html>
