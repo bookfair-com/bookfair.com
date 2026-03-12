@@ -3,201 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookfair | Buy & Sell Second Hand Books</title>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <title>Bookfair.com | Intercommunity Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1; 
-            --secondary: #10b981; 
-            --bg: #ffffff;
-            --text: #1f2937;
-            --card-bg: #f3f4f6;
-            --border: rgba(99, 102, 241, 0.2);
-            --transition: all 0.3s ease;
+            --primary: #6366f1;
+            --secondary: #10b981;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(99, 102, 241, 0.2);
         }
 
         [data-theme="dark"] {
-            --bg: #0b0e14;
-            --text: #e2e8f0;
-            --card-bg: #161b22;
-            --border: rgba(99, 102, 241, 0.4);
+            --bg: #05070a;
+            --text: #f1f5f9;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(99, 102, 241, 0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Exo 2', sans-serif;
-            background-color: var(--bg);
             color: var(--text);
-            transition: var(--transition);
-            line-height: 1.6;
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        /* --- DYNAMIC BACKGROUND --- */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg);
+            overflow: hidden;
+        }
 
-        /* Navigation */
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            filter: blur(60px);
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 { top: -100px; right: -100px; }
+        .blob-2 { bottom: -100px; left: -100px; animation-delay: -5s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; }
+
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px 0;
+            padding: 30px 0;
         }
 
-        .logo { 
-            font-weight: 800; 
-            font-size: 1.6rem; 
-            color: var(--primary); 
-            letter-spacing: -1px;
-        }
+        .logo { font-weight: 800; font-size: 1.8rem; color: var(--primary); letter-spacing: -1px; }
 
-        .theme-toggle {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Exo 2';
-            font-weight: 600;
-        }
-
-        /* Hero Section */
+        /* --- GLASS CARDS --- */
         .hero {
-            padding: 100px 0 60px;
+            padding: 80px 0;
             text-align: center;
+            backdrop-filter: blur(5px);
         }
 
         .hero h1 { 
-            font-size: 3rem; 
-            font-weight: 800; 
+            font-size: clamp(2rem, 8vw, 3.5rem); 
+            font-weight: 800;
+            line-height: 1.1;
             margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--primary), #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
-
-        .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 40px; opacity: 0.9; }
-
-        /* Action Buttons */
-        .cta-box { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 
         .btn {
-            padding: 16px 32px;
-            border-radius: 12px;
+            padding: 18px 36px;
+            border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
-            transition: var(--transition);
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: none;
             cursor: pointer;
+            font-family: 'Exo 2';
         }
 
-        .btn-main { background: var(--primary); color: white; }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3); }
+        .btn-main { background: var(--primary); color: white; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5); }
+        .btn-main:hover { transform: scale(1.05); }
 
-        .btn-sec { border: 1px solid var(--primary); color: var(--primary); background: transparent; }
-        .btn-sec:hover { background: rgba(99, 102, 241, 0.1); }
-
-        /* Marketplace Grid */
-        .section-title { margin: 60px 0 30px; font-weight: 800; font-size: 1.5rem; text-transform: uppercase; }
-
-        .grid {
+        .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
+            margin-top: 50px;
         }
 
-        .book-card {
+        .glass-card {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            transition: 0.4s;
         }
 
-        .book-card:hover { border-color: var(--primary); }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--secondary);
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 12px;
+        .glass-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            background: rgba(99, 102, 241, 0.05);
         }
 
-        .price { font-size: 1.4rem; font-weight: 800; margin: 15px 0; color: var(--primary); }
+        .price-text { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 15px 0; }
 
-        /* Mobile Optimization */
+        /* --- THEME TOGGLE --- */
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.2rem; }
-            .grid { grid-template-columns: 1fr; }
-            .cta-box { flex-direction: column; }
-            .btn { width: 100%; text-align: center; }
-        }
-
-        footer { 
-            margin-top: 80px; 
-            padding: 40px 0; 
-            border-top: 1px solid var(--border);
-            text-align: center;
-            font-size: 0.9rem;
-            opacity: 0.7;
+            .book-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-wrapper">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
     <div class="container">
         <nav>
             <div class="logo">BOOKFAIR.COM</div>
-            <button class="theme-toggle" onclick="toggleTheme()">SWITCH ATMOSPHERE</button>
+            <button class="theme-btn" onclick="toggleTheme()">DIM LIGHTS</button>
         </nav>
-    </div>
 
-    <header class="hero container">
-        <h1>India's Premier <br>Intercommunity Marketplace</h1>
-        <p>Unlock the value of your bookshelf. Buy second hand books or turn your old collection into actual money[cite: 4, 5, 12].</p>
+        <header class="hero">
+            <h1>The Future of <br><span style="color: var(--primary)">Book Exchange</span></h1>
+            <p style="margin: 20px 0 40px; opacity: 0.8;">Buy second hand books or sell your collection for actual money at India's leading online marketplace[cite: 4, 15].</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-main">EXPLORE MARKET</button>
+                <button class="btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">SELL YOUR BOOKS</button>
+            </div>
+        </header>
+
+        <h2 style="margin-bottom: 30px; font-weight: 800;">CURRENT LISTINGS</h2>
         
-        <div class="cta-box">
-            <a href="#" class="btn btn-main">EXPLORE INVENTORY</a>
-            <a href="#" class="btn btn-sec">POST A LISTING</a>
-        </div>
-    </header>
-
-    <main class="container">
-        <h2 class="section-title">Latest Arrivals</h2>
-        <div class="grid">
-            <div class="book-card">
-                <span class="badge">EXCELLENT CONDITION [cite: 100]</span>
-                <h3>Indian Art and Culture</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Author: Nitin Singhania [cite: 171]</p>
-                <div class="price">₹630</div>
-                <button class="btn btn-main" style="width: 100%; border-radius: 8px;">BUY NOW [cite: 44]</button>
+        <div class="book-grid">
+            <div class="glass-card">
+                <span style="font-size: 0.7rem; font-weight: 800; color: var(--secondary); text-transform: uppercase;">Verified Listing</span>
+                <h3 style="margin-top: 10px;">Indian Art and Culture</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Author: Nitin Singhania [cite: 167, 171]</p>
+                <div class="price-text">₹630.00</div>
+                <p style="font-size: 0.8rem; margin-bottom: 20px;">Seller: Joy Das | Pin 700104 [cite: 140, 168]</p>
+                <button class="btn btn-main" style="width: 100%; font-size: 0.8rem;">INITIATE PURCHASE</button>
             </div>
 
-            <div class="book-card">
-                <span class="badge">COLLEGE / UPSC [cite: 82, 167]</span>
-                <h3>History Book: Children</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Seller: Joy Das | Kolkata [cite: 168, 174]</p>
-                <div class="price">₹700</div>
-                <button class="btn btn-main" style="width: 100%; border-radius: 8px;">EXCHANGE ITEM [cite: 8]</button>
+            <div class="glass-card">
+                <span style="font-size: 0.7rem; font-weight: 800; color: var(--secondary); text-transform: uppercase;">UPSC / Exams</span>
+                <h3 style="margin-top: 10px;">History Book: Children</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Category: Reading Book [cite: 82, 102]</p>
+                <div class="price-text">₹700.00</div>
+                <p style="font-size: 0.8rem; margin-bottom: 20px;">Excellent Condition | Available in Kolkata [cite: 100, 168]</p>
+                <button class="btn btn-main" style="width: 100%; font-size: 0.8rem;">INITIATE PURCHASE</button>
             </div>
         </div>
-    </main>
 
-    <footer class="container">
-        <p>Copyright © 2026 Bookfair™ | Boolean Infotech Solutions [cite: 64, 215]</p>
-        <p style="margin-top: 10px; font-size: 0.8rem;">A secure, peer-to-peer platform for book lovers[cite: 16, 328].</p>
-    </footer>
+        <footer style="margin-top: 100px; padding: 40px 0; text-align: center; border-top: 1px solid var(--glass-border);">
+            <p style="font-weight: 800; font-size: 0.8rem; letter-spacing: 1px;">&copy; 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS [cite: 215]</p>
+            <p style="font-size: 0.7rem; opacity: 0.6; margin-top: 10px;">Secure Online Intercommunity Marketplace [cite: 12]</p>
+        </footer>
+    </div>
 
     <script>
         function toggleTheme() {
             const root = document.documentElement;
-            const current = root.getAttribute('data-theme');
-            root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            const isDark = root.getAttribute('data-theme') === 'dark';
+            root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.querySelector('.theme-btn').innerText = isDark ? 'DIM LIGHTS' : 'BRIGHTEN';
         }
     </script>
 </body>
