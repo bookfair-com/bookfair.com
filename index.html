@@ -4,26 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookfair.com | Intercommunity Marketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
             --bg: #f8fafc;
             --text: #0f172a;
-            --line-color: rgba(99, 102, 241, 0.15);
-            --particle-color: rgba(99, 102, 241, 0.6);
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --border: rgba(0, 0, 0, 0.1);
+            --particle-color: 99, 102, 241;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(0, 0, 0, 0.15);
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] {
             --bg: #05070a;
-            --text: #f1f5f9;
+            --text: #ffffff;
             --primary: #818cf8;
-            --line-color: rgba(129, 140, 248, 0.2);
-            --particle-color: rgba(129, 140, 248, 0.8);
-            --card-bg: rgba(15, 23, 42, 0.85);
+            --particle-color: 129, 140, 248;
+            --card-bg: rgba(10, 15, 25, 0.95);
             --border: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,99 +32,163 @@
             font-family: 'Exo 2', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.5s ease;
+            transition: background 0.4s ease;
             overflow-x: hidden;
-            min-height: 100vh;
         }
 
         #particle-canvas {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; }
-        
+        .content-layer { position: relative; z-index: 10; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* Navigation */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0; }
-        .logo { font-weight: 800; font-size: 1.8rem; color: var(--primary); letter-spacing: -1px; }
+        .logo { font-weight: 900; font-size: 2rem; color: var(--primary); letter-spacing: -1px; }
 
+        /* Hero - High Contrast */
         .hero { padding: 80px 0; text-align: center; }
-        .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; margin-bottom: 20px; }
-
-        .btn {
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-weight: 800;
-            transition: 0.3s;
-            border: none;
-            cursor: pointer;
-            font-family: 'Exo 2';
-            background: var(--primary);
-            color: #fff;
+        .hero h1 { 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            font-weight: 900; 
+            margin-bottom: 25px;
+            text-shadow: 0 4px 10px var(--shadow);
+        }
+        .hero p { 
+            font-size: 1.3rem; 
+            font-weight: 600;
+            max-width: 800px; 
+            margin: 0 auto 40px; 
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 8px;
         }
 
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin: 40px 0; }
+        /* Improved Description Boxes (Cards) */
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 35px; margin-bottom: 80px; }
+        
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 20px 40px var(--shadow);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover { transform: translateY(-12px); border-color: var(--primary); }
+
+        .glass-card h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 12px; }
+        
+        .label { font-weight: 700; color: var(--primary); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+
+        .price-tag { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            margin: 20px 0; 
+            color: var(--text);
+            display: flex;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 20px;
+            border-radius: 16px;
+            font-weight: 900;
+            font-family: 'Exo 2';
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+            background: var(--primary);
+            color: white;
             transition: 0.3s;
         }
 
-        footer { padding: 40px 0; text-align: center; border-top: 1px solid var(--border); font-size: 0.8rem; font-weight: 600; opacity: 0.7; }
+        .btn:hover { filter: brightness(1.2); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); }
+
+        .theme-btn {
+            background: var(--text);
+            color: var(--bg);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+        }
+
+        footer { 
+            padding: 60px 0; 
+            text-align: center; 
+            font-weight: 900; 
+            letter-spacing: 2px;
+            opacity: 0.8;
+            border-top: 2px solid var(--border);
+        }
     </style>
 </head>
 <body>
 
     <canvas id="particle-canvas"></canvas>
 
-    <div class="container">
-        <nav>
-            <div class="logo">BOOKFAIR.COM</div>
-            <button class="btn" onclick="toggleTheme()" style="background: var(--card-bg); color: var(--text); border: 1px solid var(--border);">THEME SHIFT</button>
-        </nav>
+    <div class="content-layer">
+        <div class="container">
+            <nav>
+                <div class="logo">BOOKFAIR.COM</div>
+                <button class="theme-btn" onclick="toggleTheme()">TOGGLE THEME</button>
+            </nav>
 
-        <header class="hero">
-            <h1>Intercommunity <br><span style="color: var(--primary)">Marketplace</span></h1>
-            <p style="margin: 20px 0 40px; font-size: 1.1rem; opacity: 0.8;">Buy second hand books or sell old books online at best prices[cite: 5, 15].</p>
-        </header>
+            <header class="hero">
+                <h1>REVOLUTIONIZING<br><span style="color: var(--primary)">BOOK RE-COMMERCE.</span></h1>
+                <p>Buy, sell, rent, or exchange second-hand books at the best prices[cite: 5, 8, 9].</p>
+            </header>
 
-        <div class="book-grid">
-            <div class="glass-card">
-                <h3>Indian Art and Culture</h3>
-                <p style="opacity: 0.7; font-size: 0.9rem;">ISBN 9789353168193 [cite: 167]</p>
-                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹630 [cite: 115]</div>
-                <button class="btn" style="width: 100%;">BUY NOW </button>
+            <div class="book-grid">
+                <div class="glass-card">
+                    <span class="label">UPSC / Civil Services</span>
+                    <h3>Indian Art and Culture</h3>
+                    <p style="font-weight: 700; opacity: 0.8;">Author: Nitin Singhania </p>
+                    <div class="price-tag">₹630</div>
+                    <p style="margin-bottom: 25px; font-weight: 600;">Condition: Excellent </p>
+                    <button class="btn">Initiate Buy Now [cite: 315]</button>
+                </div>
+
+                <div class="glass-card">
+                    <span class="label">Children's Education</span>
+                    <h3>History Book Children</h3>
+                    <p style="font-weight: 700; opacity: 0.8;">Seller: Joy Das [cite: 168]</p>
+                    <div class="price-tag">₹700</div>
+                    <p style="margin-bottom: 25px; font-weight: 600;">Ad ID: 3461673796514383 [cite: 165]</p>
+                    <button class="btn">Initiate Buy Now [cite: 315]</button>
+                </div>
             </div>
-            <div class="glass-card">
-                <h3>History Book Children</h3>
-                <p style="opacity: 0.7; font-size: 0.9rem;">Seller: Joy Das [cite: 140]</p>
-                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹700 [cite: 177]</div>
-                <button class="btn" style="width: 100%;">BUY NOW </button>
-            </div>
+
+            <footer>
+                COPYRIGHT © 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS [cite: 215]
+            </footer>
         </div>
-
-        <footer>
-            COPYRIGHT © 2026 BOOKFAIR | Alekhyo Biswas, Joy Das [cite: 64, 215]
-        </footer>
     </div>
 
     <script>
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let isAssembled = false;
-        let cycleTimer = 0;
+        let connectionDist = 150;
 
-        function getColors() {
-            const style = getComputedStyle(document.documentElement);
-            return {
-                dot: style.getPropertyValue('--particle-color'),
-                line: style.getPropertyValue('--line-color')
-            };
+        function getParticleColor() {
+            const rgb = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
+            return rgb.trim();
         }
 
         function resize() {
@@ -134,81 +198,45 @@
 
         class Particle {
             constructor() {
-                this.reset();
-            }
-            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                // Target position (for book outline)
-                this.tx = this.x;
-                this.ty = this.y;
-                this.size = Math.random() * 3 + 2; // Bigger dots
-                this.vx = Math.random() * 0.4 - 0.2;
-                this.vy = Math.random() * 0.4 - 0.2;
+                this.size = Math.random() * 4 + 2; // Bigger dots
+                this.speedX = Math.random() * 0.8 - 0.4;
+                this.speedY = Math.random() * 0.8 - 0.4;
             }
             update() {
-                if (isAssembled) {
-                    // Gravitate toward target
-                    this.x += (this.tx - this.x) * 0.05;
-                    this.y += (this.ty - this.y) * 0.05;
-                } else {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                }
-                
-                // Wrap around edges
-                if (this.x < 0) this.x = canvas.width;
+                this.x += this.speedX;
+                this.y += this.speedY;
                 if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
+                else if (this.x < 0) this.x = canvas.width;
                 if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
             }
-        }
-
-        function createBookOutline() {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const w = 180, h = 240; // Book dimensions
-            
-            particles.forEach((p, i) => {
-                if (i < 150) { // Only use first 150 particles for the shape
-                    const side = i % 4;
-                    const pos = Math.random();
-                    if (side === 0) { p.tx = centerX - w/2 + (w * pos); p.ty = centerY - h/2; } // Top
-                    else if (side === 1) { p.tx = centerX + w/2; p.ty = centerY - h/2 + (h * pos); } // Right
-                    else if (side === 2) { p.tx = centerX - w/2 + (w * pos); p.ty = centerY + h/2; } // Bottom
-                    else { p.tx = centerX - w/2; p.ty = centerY - h/2 + (h * pos); } // Left
-                } else {
-                    // Random wander for others
-                    p.tx = Math.random() * canvas.width;
-                    p.ty = Math.random() * canvas.height;
-                }
-            });
+            draw() {
+                ctx.fillStyle = `rgb(${getParticleColor()})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
         function init() {
             particles = [];
-            for (let i = 0; i < 200; i++) particles.push(new Particle());
+            const count = (canvas.width * canvas.height) / 15000;
+            for (let i = 0; i < count; i++) particles.push(new Particle());
         }
 
-        function animate() {
-            const colors = getColors();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            cycleTimer++;
-            if (cycleTimer % 400 === 0) {
-                isAssembled = !isAssembled;
-                if (isAssembled) createBookOutline();
-            }
-
-            // Draw Lines
-            ctx.strokeStyle = colors.line;
-            ctx.lineWidth = 0.8;
+        function drawLines() {
+            const color = getParticleColor();
             for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
+                for (let j = i; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < 100) {
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < connectionDist) {
+                        ctx.strokeStyle = `rgba(${color}, ${1 - dist/connectionDist})`;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -216,26 +244,25 @@
                     }
                 }
             }
+        }
 
-            // Draw Dots
-            ctx.fillStyle = colors.dot;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.update();
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
+                p.draw();
             });
-
+            drawLines();
             requestAnimationFrame(animate);
         }
 
         function toggleTheme() {
             const root = document.documentElement;
-            const isDark = root.getAttribute('data-theme') === 'dark';
-            root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            const current = root.getAttribute('data-theme');
+            root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', () => { resize(); init(); });
         resize();
         init();
         animate();
