@@ -8,200 +8,203 @@
     <style>
         :root {
             --primary: #6366f1;
-            --secondary: #10b981;
             --bg: #f8fafc;
-            --text: #1e293b;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(99, 102, 241, 0.2);
+            --text: #0f172a;
+            --particle-color: rgba(99, 102, 241, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border: rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] {
             --bg: #05070a;
             --text: #f1f5f9;
-            --card-bg: rgba(15, 23, 42, 0.7);
-            --glass-border: rgba(99, 102, 241, 0.4);
+            --primary: #818cf8;
+            --particle-color: rgba(129, 140, 248, 0.5);
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Exo 2', sans-serif;
+            background-color: var(--bg);
             color: var(--text);
-            transition: background 0.5s ease;
+            transition: background 0.4s ease, color 0.4s ease;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
-        /* --- DYNAMIC BACKGROUND --- */
-        .bg-wrapper {
+        #particle-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: var(--bg);
-            overflow: hidden;
+            pointer-events: none;
         }
 
-        .blob {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
-            filter: blur(60px);
-            animation: move 20s infinite alternate;
-        }
-
-        .blob-1 { top: -100px; right: -100px; }
-        .blob-2 { bottom: -100px; left: -100px; animation-delay: -5s; }
-
-        @keyframes move {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(100px, 100px) scale(1.2); }
-        }
-
-        /* --- LAYOUT --- */
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 30px 0;
-        }
-
+        /* Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 40px 0; }
         .logo { font-weight: 800; font-size: 1.8rem; color: var(--primary); letter-spacing: -1px; }
 
-        /* --- GLASS CARDS --- */
-        .hero {
-            padding: 80px 0;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .hero h1 { 
-            font-size: clamp(2rem, 8vw, 3.5rem); 
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 20px;
+        /* Hero */
+        .hero { padding: 100px 0 60px; text-align: center; }
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; margin-bottom: 20px; }
+        
+        /* Interactive Elements */
+        .theme-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Exo 2';
+            font-weight: 600;
+            transition: 0.3s;
         }
 
         .btn {
             padding: 18px 36px;
             border-radius: 14px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 800;
             display: inline-block;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s;
             border: none;
             cursor: pointer;
             font-family: 'Exo 2';
+            background: var(--primary);
+            color: #fff;
         }
 
-        .btn-main { background: var(--primary); color: white; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5); }
-        .btn-main:hover { transform: scale(1.05); }
-
-        .book-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
+        /* Glass Cards */
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; margin: 60px 0; }
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 30px;
-            transition: 0.4s;
+            padding: 35px;
+            transition: 0.3s;
         }
+        .glass-card:hover { transform: translateY(-5px); border-color: var(--primary); }
 
-        .glass-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-10px);
-            background: rgba(99, 102, 241, 0.05);
-        }
-
-        .price-text { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 15px 0; }
-
-        /* --- THEME TOGGLE --- */
-        .theme-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text);
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
+        footer { 
+            padding: 60px 0; 
+            text-align: center; 
+            border-top: 1px solid var(--border); 
+            font-size: 0.8rem; 
+            letter-spacing: 1px;
             font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.2rem; }
-            .book-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-wrapper">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
+    <canvas id="particle-canvas"></canvas>
 
     <div class="container">
         <nav>
             <div class="logo">BOOKFAIR.COM</div>
-            <button class="theme-btn" onclick="toggleTheme()">DIM LIGHTS</button>
+            <button class="theme-btn" onclick="toggleTheme()">DARK/LIGHT MODE</button>
         </nav>
 
         <header class="hero">
-            <h1>The Future of <br><span style="color: var(--primary)">Book Exchange</span></h1>
-            <p style="margin: 20px 0 40px; opacity: 0.8;">Buy second hand books or sell your collection for actual money at India's leading online marketplace[cite: 4, 15].</p>
-            
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn btn-main">EXPLORE MARKET</button>
-                <button class="btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">SELL YOUR BOOKS</button>
-            </div>
+            <h1>India's Leading <br><span style="color: var(--primary)">Intercommunity Marketplace</span></h1>
+            <p style="margin: 20px 0 40px; font-size: 1.2rem; opacity: 0.8;">Buy second hand books and sell old books online at best prices. [cite: 5]</p>
+            <button class="btn">POST A FREE AD</button>
         </header>
 
-        <h2 style="margin-bottom: 30px; font-weight: 800;">CURRENT LISTINGS</h2>
-        
         <div class="book-grid">
             <div class="glass-card">
-                <span style="font-size: 0.7rem; font-weight: 800; color: var(--secondary); text-transform: uppercase;">Verified Listing</span>
-                <h3 style="margin-top: 10px;">Indian Art and Culture</h3>
-                <p style="font-size: 0.9rem; opacity: 0.7;">Author: Nitin Singhania [cite: 167, 171]</p>
-                <div class="price-text">₹630.00</div>
-                <p style="font-size: 0.8rem; margin-bottom: 20px;">Seller: Joy Das | Pin 700104 [cite: 140, 168]</p>
-                <button class="btn btn-main" style="width: 100%; font-size: 0.8rem;">INITIATE PURCHASE</button>
+                <h3 style="margin-bottom: 10px;">Indian Art and Culture</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">ISBN 9789353168193 </p>
+                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹630</div>
+                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 12px;">INITIATE BUY NOW</button>
             </div>
 
             <div class="glass-card">
-                <span style="font-size: 0.7rem; font-weight: 800; color: var(--secondary); text-transform: uppercase;">UPSC / Exams</span>
-                <h3 style="margin-top: 10px;">History Book: Children</h3>
-                <p style="font-size: 0.9rem; opacity: 0.7;">Category: Reading Book [cite: 82, 102]</p>
-                <div class="price-text">₹700.00</div>
-                <p style="font-size: 0.8rem; margin-bottom: 20px;">Excellent Condition | Available in Kolkata [cite: 100, 168]</p>
-                <button class="btn btn-main" style="width: 100%; font-size: 0.8rem;">INITIATE PURCHASE</button>
+                <h3 style="margin-bottom: 10px;">History Book Children</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">Posted by Joy Das [cite: 168]</p>
+                <div style="font-size: 1.8rem; font-weight: 800; margin: 15px 0; color: var(--primary);">₹700</div>
+                <button class="btn" style="width: 100%; font-size: 0.8rem; padding: 12px;">INITIATE BUY NOW</button>
             </div>
         </div>
 
-        <footer style="margin-top: 100px; padding: 40px 0; text-align: center; border-top: 1px solid var(--glass-border);">
-            <p style="font-weight: 800; font-size: 0.8rem; letter-spacing: 1px;">&copy; 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS [cite: 215]</p>
-            <p style="font-size: 0.7rem; opacity: 0.6; margin-top: 10px;">Secure Online Intercommunity Marketplace [cite: 12]</p>
+        <footer>
+            COPYRIGHT © 2026 BOOKFAIR | BOOLEAN INFOTECH SOLUTIONS 
         </footer>
     </div>
 
     <script>
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let particleColor = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = particleColor;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < 80; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
         function toggleTheme() {
             const root = document.documentElement;
             const isDark = root.getAttribute('data-theme') === 'dark';
             root.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.querySelector('.theme-btn').innerText = isDark ? 'DIM LIGHTS' : 'BRIGHTEN';
+            
+            // Sync particle colors with theme
+            setTimeout(() => {
+                particleColor = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
+            }, 100);
         }
+
+        window.addEventListener('resize', resize);
+        resize();
+        init();
+        animate();
     </script>
 </body>
 </html>
