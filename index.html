@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About | The Smart Exchange Network</title>
+    <title>Bookfair | Read & Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -76,6 +76,7 @@
             padding: 0 24px;
         }
 
+        /* Header / Nav */
         nav {
             display: flex;
             justify-content: space-between;
@@ -83,13 +84,29 @@
             padding: 40px 0;
         }
 
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+        }
+
         .logo { 
             font-weight: 900; 
-            font-size: 2.2rem; 
+            font-size: 2.5rem; 
             background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px; 
+            line-height: 1;
+        }
+
+        .tagline {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            opacity: 0.8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 5px;
         }
 
         .theme-btn {
@@ -114,36 +131,95 @@
             transform: translateY(-2px);
         }
 
-        /* --- NARRATIVE SECTIONS --- */
-        .hero {
-            min-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-bottom: 10vh;
+        /* --- ACTION BOXES (Buy, Rent, Sell) --- */
+        .action-boxes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0 80px;
+            perspective: 1000px;
         }
 
-        .hero h1 {
-            font-size: clamp(3rem, 7vw, 6rem);
+        .action-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-box:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .action-box h3 {
+            font-size: 2rem;
             font-weight: 900;
-            line-height: 1;
-            margin-bottom: 30px;
-            letter-spacing: -2px;
+            transform: translateZ(30px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .hero p {
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-            font-weight: 400;
-            opacity: 0.9;
-            max-width: 750px;
+        /* --- BOOK CATEGORIES --- */
+        .categories-section {
+            margin-bottom: 100px;
         }
 
-        .highlight {
+        .category-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 40px 0 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
             color: var(--primary);
-            font-weight: 700;
         }
 
-        /* --- 3D GLASS PANELS --- */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .book-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--glow);
+            border-color: var(--primary);
+        }
+
+        .book-cover {
+            height: 150px;
+            background: linear-gradient(45deg, var(--border), transparent);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            opacity: 0.5;
+        }
+
+        .book-card h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+        .book-card p { font-size: 0.9rem; opacity: 0.8; }
+
+        /* --- 3D GLASS PANELS (Narrative) --- */
         .story-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -152,11 +228,7 @@
             perspective: 1000px;
         }
 
-        .panel-container {
-            display: flex;
-            justify-content: center;
-        }
-
+        .panel-container { display: flex; justify-content: center; }
         .panel-container.align-right { justify-content: flex-end; }
         .panel-container.align-left { justify-content: flex-start; }
 
@@ -172,6 +244,7 @@
             box-shadow: 0 25px 50px rgba(0,0,0,0.1);
             transition: transform 0.1s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
             transform-style: preserve-3d;
+            position: relative;
         }
 
         .glass-panel:hover {
@@ -184,7 +257,7 @@
             font-weight: 900;
             margin-bottom: 20px;
             color: var(--text);
-            transform: translateZ(30px); /* 3D pop effect */
+            transform: translateZ(30px);
         }
 
         .glass-panel p {
@@ -192,6 +265,41 @@
             opacity: 0.85;
             margin-bottom: 20px;
             transform: translateZ(20px);
+        }
+
+        /* --- FLOATING ICONS --- */
+        .floating-icon {
+            font-size: 4.5rem;
+            position: absolute;
+            opacity: 0.25;
+            animation: float 5s ease-in-out infinite;
+            z-index: -1;
+            transform: translateZ(10px);
+        }
+
+        .action-box .floating-icon {
+            position: relative;
+            font-size: 3.5rem;
+            display: block;
+            margin: 0 auto 15px;
+            opacity: 0.8;
+            animation: float-small 4s ease-in-out infinite;
+        }
+
+        .icon-tr { top: -25px; right: 25px; }
+        .icon-tl { top: -25px; left: 25px; }
+        .icon-br { bottom: 10px; right: 25px; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg) translateZ(10px); }
+            50% { transform: translateY(-15px) rotate(8deg) translateZ(10px); }
+            100% { transform: translateY(0px) rotate(0deg) translateZ(10px); }
+        }
+
+        @keyframes float-small {
+            0% { transform: translateY(0px) translateZ(20px); }
+            50% { transform: translateY(-10px) translateZ(20px); }
+            100% { transform: translateY(0px) translateZ(20px); }
         }
 
         /* --- ANIMATIONS --- */
@@ -219,7 +327,9 @@
         @media (max-width: 768px) {
             .glass-panel { padding: 40px 25px; }
             .story-grid { gap: 50px; }
-            nav { flex-direction: column; gap: 20px; }
+            .action-boxes { grid-template-columns: 1fr; gap: 20px; }
+            nav { flex-direction: row; flex-wrap: wrap; }
+            .theme-btn { margin-top: 15px; width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -231,20 +341,96 @@
 
     <div class="content-layer">
         <div class="container">
+            
             <nav>
-                <div class="logo">BOOKFAIR</div>
-                <button class="theme-btn" onclick="toggleTheme()">Atmosphere</button>
+                <div class="brand-container">
+                    <div class="logo">BOOKFAIR</div>
+                    <div class="tagline">Read & Return</div>
+                </div>
+                <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">Dark Mode</button>
             </nav>
 
-            <section class="hero reveal">
-                <h1>IDLE BOOKS ARE<br><span class="highlight">TRAPPED CAPITAL.</span></h1>
-                <p>Every read novel and completed textbook sitting on your shelf represents unutilized value. We built the infrastructure to release it.</p>
-            </section>
+            <div class="action-boxes reveal">
+                <div class="action-box tilt-card">
+                    <span class="floating-icon">🛒</span>
+                    <h3>Buy</h3>
+                </div>
+                <div class="action-box tilt-card">
+                    <span class="floating-icon">⏳</span>
+                    <h3>Rent</h3>
+                </div>
+                <div class="action-box tilt-card">
+                    <span class="floating-icon">💰</span>
+                    <h3>Sell</h3>
+                </div>
+            </div>
+
+            <div class="categories-section reveal">
+                
+                <h2 class="category-title">Fiction</h2>
+                <div class="book-grid">
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Sci-Fi Anthology</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Classic Literature</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Modern Thriller</h4>
+                        <p>Loading database...</p>
+                    </div>
+                </div>
+
+                <h2 class="category-title">Non-Fiction</h2>
+                <div class="book-grid">
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Startup Economics</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Historical Biography</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Psychology Today</h4>
+                        <p>Loading database...</p>
+                    </div>
+                </div>
+
+                <h2 class="category-title">Academic</h2>
+                <div class="book-grid">
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Calculus III</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Organic Chemistry</h4>
+                        <p>Loading database...</p>
+                    </div>
+                    <div class="book-card tilt-card">
+                        <div class="book-cover">Awaiting Data</div>
+                        <h4>Data Structures</h4>
+                        <p>Loading database...</p>
+                    </div>
+                </div>
+
+            </div>
 
             <div class="story-grid">
                 
                 <div class="panel-container align-left reveal">
                     <div class="glass-panel tilt-card">
+                        <div class="floating-icon icon-tr">🌐</div>
                         <h2>The Peer-to-Peer Paradigm</h2>
                         <p>Why allow corporate distributors and retail giants to dictate the worth of your property? Bookfair bypasses the middleman entirely.</p>
                         <p>By connecting directly with the next reader, you establish the true market value. Retaining one hundred percent of your transaction isn't just an option—it's the only logical approach to modern exchange.</p>
@@ -253,6 +439,7 @@
 
                 <div class="panel-container align-right reveal">
                     <div class="glass-panel tilt-card">
+                        <div class="floating-icon icon-tl">💸</div>
                         <h2>Liquidate Your Library</h2>
                         <p>Those heavy academic texts from last semester are currently a depreciating asset. Leaving them to gather dust while someone else pays retail price is a systemic inefficiency.</p>
                         <p>Our network transforms that physical clutter into immediate, usable capital. List your inventory, set your margins, and convert pages into profit.</p>
@@ -261,6 +448,7 @@
 
                 <div class="panel-container align-left reveal">
                     <div class="glass-panel tilt-card">
+                        <div class="floating-icon icon-br">🛡️</div>
                         <h2>Frictionless Trust</h2>
                         <p>A decentralized market requires absolute security. Every interaction within this ecosystem is insulated by advanced payment gateways and strict verification protocols.</p>
                         <p>Your funds are cryptographically secured and transferred only upon successful delivery. It is a seamless, risk-free environment designed to protect your assets.</p>
@@ -270,16 +458,24 @@
             </div>
 
             <footer>
-                (c) Alekhyo Biswas April 14, 2026
+                (c) Alekhyo Biswas April 16, 2026
             </footer>
         </div>
     </div>
 
     <script>
-        // --- 1. Dark Mode Logic ---
+        // --- 1. Dark/Light Mode Logic ---
         function toggleTheme() {
             const root = document.documentElement;
-            root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            const btn = document.getElementById('theme-toggle');
+            
+            if (root.getAttribute('data-theme') === 'dark') {
+                root.setAttribute('data-theme', 'light');
+                btn.innerText = 'Dark Mode';
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                btn.innerText = 'Light Mode';
+            }
             updateParticleColors();
         }
 
@@ -290,7 +486,7 @@
                     entry.target.classList.add('active');
                 }
             });
-        }, { threshold: 0.15 });
+        }, { threshold: 0.1 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
         // --- 3. 3D Tilt Effect for Glass Cards ---
@@ -303,7 +499,7 @@
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 
-                const rotateX = ((y - centerY) / centerY) * -5; // Max rotation 5deg
+                const rotateX = ((y - centerY) / centerY) * -5;
                 const rotateY = ((x - centerX) / centerX) * 5;
                 
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
@@ -363,39 +559,4 @@
             for (let i = 0; i < count; i++) particles.push(new Particle());
         }
 
-        function drawLines() {
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 120) {
-                        ctx.strokeStyle = `rgba(${lColor}, ${1 - dist/120})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            drawLines();
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', resize);
-        updateParticleColors();
-        resize();
-        animate();
-    </script>
-</body>
-</html>
+        function drawLin
