@@ -534,30 +534,74 @@
         }
 
         // Handle Form Submission Logic
-        authForm.addEventListener('submit', function(e) {
+        authForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const uid = document.getElementById('userid').value.trim();
             const pass = document.getElementById('password').value;
             const errorBox = document.getElementById('auth-error');
+            const submitBtn = document.getElementById('auth-submit-btn');
             
-            // Fetch simulated database
             const db = JSON.parse(localStorage.getItem('bookfair_users'));
 
             if (currentAuthMode === 'signup') {
                 const fname = document.getElementById('fullname').value.trim();
+                
+                // 1. Get the Proof Token from the hCaptcha box
+                const captchaToken = hcaptcha.getResponse();
+                
+                if (captchaToken === "") {
+                    errorBox.innerText = "Please complete the security check.";
+                    errorBox.classList.remove('hidden');
+                    return; 
+                }
+
                 if (db[uid]) {
                     errorBox.innerText = "User ID already exists.";
                     errorBox.classList.remove('hidden');
-                } else {
-                    // Save new user
-                    db[uid] = { pass: pass, name: fname };
-                    localStorage.setItem('bookfair_users', JSON.stringify(db));
-                    localStorage.setItem('bookfair_active_user', fname);
-                    authForm.reset();
-                    checkAuthState();
+                    hcaptcha.reset(); 
+                    return;
                 }
+
+                // --- THE SECURE BACKEND CHECK ---
+                submitBtn.innerText = "Verifying..."; // Show loading state
+                submitBtn.disabled = true;
+
+                try {
+                    // Your official, unblockable Render API URL
+                    const authURL = "https://bookfair-auth.onrender.com/verify-signup";
+                    
+                    const response = await fetch(authURL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: captchaToken })
+                    });
+                    
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Captcha passed! Save the user and log them in.
+                        db[uid] = { pass: pass, name: fname };
+                        localStorage.setItem('bookfair_users', JSON.stringify(db));
+                        localStorage.setItem('bookfair_active_user', fname);
+                        authForm.reset();
+                        hcaptcha.reset(); 
+                        checkAuthState();
+                    } else {
+                        // Bot detected or token expired
+                        errorBox.innerText = data.message;
+                        errorBox.classList.remove('hidden');
+                        hcaptcha.reset();
+                    }
+                } catch (error) {
+                    errorBox.innerText = "Could not connect to verification server.";
+                    errorBox.classList.remove('hidden');
+                } finally {
+                    submitBtn.innerText = "Sign Up";
+                    submitBtn.disabled = false;
+                }
+
             } else {
-                // Login verification
+                // Login Flow
                 if (db[uid] && db[uid].pass === pass) {
                     localStorage.setItem('bookfair_active_user', db[uid].name);
                     authForm.reset();
@@ -568,6 +612,7 @@
                 }
             }
         });
+
 
         // WIPE DATA ON LOGOUT
         function signOut() {
