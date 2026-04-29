@@ -11,6 +11,25 @@ const UaaODatabase = {
     }
 };
 
+// --- STRIPE SECURE PAYMENT INITIALIZATION ---
+// This is Stripe's universal test key. It is safe to be public!
+const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx'); 
+const elements = stripe.elements();
+
+// Create the secure UI component
+const cardElement = elements.create('card', {
+    style: {
+        base: {
+            iconColor: '#6366f1',
+            color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#0f172a',
+            fontFamily: '"Exo 2", sans-serif',
+            fontSize: '16px',
+            '::placeholder': { color: '#aab7c4' }
+        },
+        invalid: { color: '#ff4757', iconColor: '#ff4757' }
+    }
+});
+
 // --- 1. STATE ROUTER & AUTHENTICATION ---
 const vLanding = document.getElementById('view-landing');
 const vAuth = document.getElementById('view-auth');
@@ -68,6 +87,7 @@ function showLanding() {
     document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
+    if(cardElement) cardElement.clear();
     checkAuthState();
 }
 
@@ -82,6 +102,7 @@ function toggleAuthMode() {
     document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
+    if(cardElement) cardElement.clear();
 
     if (currentAuthMode === 'signup') {
         // Switch to LOGIN
@@ -193,31 +214,51 @@ authForm.addEventListener('submit', function(e) {
             return;
         }
 
-        submitBtn.innerText = "Verifying..."; 
+        submitBtn.innerText = "Encrypting..."; 
         submitBtn.disabled = true;
 
-        setTimeout(() => {
-            UaaODatabase[uid] = { 
-                pass: pass, 
-                name: fname, 
-                email: email,
-                phone: phone,
-                wallet: 0, 
-                unsettledBooks: 0, 
-                inbox: 0 
-            };
-            
-            localStorage.setItem('bookfair_active_user', fname);
-            
-            authForm.reset();
-            document.getElementById('password').type = 'password';
-            document.getElementById('eye-icon').classList.add('hidden');
-            document.getElementById('eye-slash-icon').classList.remove('hidden');
-            hcaptcha.reset(); 
-            submitBtn.innerText = "Sign Up";
-            submitBtn.disabled = false;
-            checkAuthState();
-        }, 1200);
+        // 1. Ask Stripe to tokenize the credit card FIRST
+        stripe.createToken(cardElement).then(function(result) {
+            if (result.error) {
+                // The user typed a bad card number
+                errorBox.innerText = result.error.message;
+                errorBox.classList.remove('hidden');
+                submitBtn.innerText = "Sign Up";
+                submitBtn.disabled = false;
+                hcaptcha.reset();
+            } else {
+                // 2. Success! We got the secure token from Stripe!
+                const securePaymentToken = result.token.id;
+                console.log("SUCCESS! Stripe Token Generated:", securePaymentToken);
+                
+                // Simulate server communication latency
+                setTimeout(() => {
+                    // Save to UaaO Object (Notice we save the TOKEN, not the card number)
+                    UaaODatabase[uid] = { 
+                        pass: pass, 
+                        name: fname, 
+                        email: email,
+                        phone: phone,
+                        stripeToken: securePaymentToken, // <--- Secured!
+                        wallet: 0, 
+                        unsettledBooks: 0, 
+                        inbox: 0 
+                    };
+                    
+                    localStorage.setItem('bookfair_active_user', fname);
+                    
+                    authForm.reset();
+                    cardElement.clear(); // Wipe the Stripe box
+                    document.getElementById('password').type = 'password';
+                    document.getElementById('eye-icon').classList.add('hidden');
+                    document.getElementById('eye-slash-icon').classList.remove('hidden');
+                    hcaptcha.reset(); 
+                    submitBtn.innerText = "Sign Up";
+                    submitBtn.disabled = false;
+                    checkAuthState();
+                }, 1200);
+            }
+        });
 
     } else {
         if (UaaODatabase[uid] && UaaODatabase[uid].pass === pass) {
@@ -240,6 +281,7 @@ function signOut() {
     document.getElementById('password').type = 'password';
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
+    if(cardElement) cardElement.clear();
     if (currentAuthMode === 'login') toggleAuthMode(); 
     checkAuthState();
 }
@@ -256,6 +298,14 @@ function toggleTheme() {
         btn.innerText = 'Light Mode';
     }
     updateParticleColors();
+    
+    // Update Stripe element styling to match theme
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    cardElement.update({
+        style: {
+            base: { color: isDark ? '#f8fafc' : '#0f172a' }
+        }
+    });
 }
 
 // --- 3. 3D TILT & SCROLL OBSERVER ---
@@ -344,4 +394,7 @@ window.addEventListener('load', () => {
     canvas.width = window.innerWidth; 
     canvas.height = window.innerHeight;
     checkAuthState(); 
+    
+    // Mount Stripe Secure Element
+    cardElement.mount('#card-element');
 });
