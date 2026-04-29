@@ -129,18 +129,38 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .divider { display: flex; align-items: center; text-align: center; margin-bottom: 25px; color: var(--text); opacity: 0.6; font-size: 0.9rem; font-weight: 700; }
 .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); margin: 0 10px; }
 
-/* Password Field Upgrades */
+/* Input Fields */
 .input-group { margin-bottom: 20px; }
 .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
 .input-group input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid var(--border); background: rgba(0,0,0,0.05); color: var(--text); font-family: 'Exo 2'; font-size: 1rem; transition: border-color 0.3s; }
 [data-theme="dark"] .input-group input { background: rgba(255,255,255,0.05); }
 .input-group input:focus { outline: none; border-color: var(--primary); }
 
+/* Password Field Upgrades */
 .password-wrapper { position: relative; display: flex; align-items: center; }
 .password-wrapper input { padding-right: 50px; } 
 .password-toggle { position: absolute; right: 15px; background: none; border: none; color: var(--text); opacity: 0.5; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
 .password-toggle:hover { opacity: 1; color: var(--primary); }
 .password-toggle svg { width: 22px; height: 22px; }
+
+/* Stripe Secure Element Styling */
+.stripe-box {
+    width: 100%; 
+    padding: 15px; 
+    border-radius: 10px; 
+    border: 2px solid var(--border); 
+    background: rgba(0,0,0,0.05); 
+    transition: border-color 0.3s;
+}
+[data-theme="dark"] .stripe-box { 
+    background: rgba(255,255,255,0.05); 
+}
+.stripe-box.StripeElement--focus {
+    border-color: var(--primary);
+}
+.stripe-box.StripeElement--invalid {
+    border-color: var(--error);
+}
 
 .h-captcha-container { margin-bottom: 20px; display: flex; justify-content: center; }
 .error-msg { color: var(--error); font-weight: 700; text-align: center; margin-bottom: 15px; font-size: 0.9rem; }
@@ -260,13 +280,13 @@ footer { text-align: center; padding: 60px 20px; border-top: 1px solid var(--bor
         gap: 15px;
         padding-bottom: 15px; 
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Hides scrollbar in Firefox */
+        scrollbar-width: none; 
     }
     .book-grid::-webkit-scrollbar { 
-        display: none; /* Hides scrollbar in Chrome/Safari */
+        display: none; 
     }
     .book-card, .book-item { 
-        flex: 0 0 75%; /* Forces the card to take 75% width, showing the edge of the next card */
+        flex: 0 0 75%; 
         scroll-snap-align: center; 
     }
 }
