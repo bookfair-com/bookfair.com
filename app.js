@@ -1,9 +1,10 @@
 // --- 0. UaaO (User-as-an-Object) ARCHITECTURE ---
-// Hardcoded user database replacing MongoDB/localStorage for now.
 const UaaODatabase = {
     "alekhyo_0812": { 
         pass: "bookfair@test", 
         name: "Alekhyo Biswas",
+        email: "alekhyo@example.com",
+        phone: "+91 00000 00000",
         wallet: 1450,
         unsettledBooks: 4,
         inbox: 2
@@ -24,32 +25,27 @@ function checkAuthState() {
     const activeUser = localStorage.getItem('bookfair_active_user');
     
     if (activeUser) {
-        // Determine First Name
         const firstName = activeUser.split(' ')[0];
         document.getElementById('dash-greeting').innerText = `Welcome back, ${firstName}.`;
 
-        // DASHBOARD MODE
         vLanding.classList.add('hidden');
         vAuth.classList.add('hidden');
         btnNavAuth.classList.add('hidden');
         vDashboard.classList.remove('hidden');
         btnLogout.classList.remove('hidden');
         
-        // PERFORMANCE: Kill particles
         canvas.style.display = 'none';
         if(animationFrameId) {
             cancelAnimationFrame(animationFrameId); 
             animationFrameId = null;
         }
     } else {
-        // LANDING MODE
         vDashboard.classList.add('hidden');
         vAuth.classList.add('hidden');
         btnLogout.classList.add('hidden');
         vLanding.classList.remove('hidden');
         btnNavAuth.classList.remove('hidden');
         
-        // START/RESTART Particles securely
         canvas.style.display = 'block';
         resize();
         if (!animationFrameId) animate();
@@ -67,9 +63,9 @@ function showAuth(mode) {
 }
 
 function showLanding() {
-    authForm.reset(); // WIPE DATA
+    authForm.reset(); 
     document.getElementById('auth-error').classList.add('hidden');
-    document.getElementById('password').type = 'password'; // Reset to hidden
+    document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
     checkAuthState();
@@ -77,15 +73,13 @@ function showLanding() {
 
 function toggleAuthMode() {
     const title = document.getElementById('auth-title');
-    const nameGroup = document.getElementById('name-group');
-    const captchaGroup = document.getElementById('captcha-container');
     const submitBtn = document.getElementById('auth-submit-btn');
     const toggleLink = document.getElementById('auth-toggle-link');
+    const signupOnlyFields = document.querySelectorAll('.signup-only');
 
-    // SECURITY: Wipe form on toggle
     authForm.reset();
     document.getElementById('auth-error').classList.add('hidden');
-    document.getElementById('password').type = 'password'; // Reset visibility on toggle
+    document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
 
@@ -93,21 +87,62 @@ function toggleAuthMode() {
         // Switch to LOGIN
         currentAuthMode = 'login';
         title.innerText = 'Welcome Back';
-        nameGroup.classList.add('hidden');
-        captchaGroup.classList.add('hidden'); // Hide captcha on login
-        document.getElementById('fullname').removeAttribute('required');
         submitBtn.innerText = 'Log In';
         toggleLink.innerText = "Don't have an account? Sign Up";
+        
+        // Hide expanded fields
+        signupOnlyFields.forEach(el => el.classList.add('hidden'));
+        document.getElementById('fullname').removeAttribute('required');
+        document.getElementById('email').removeAttribute('required');
+        document.getElementById('phone').removeAttribute('required');
     } else {
         // Switch to SIGNUP
         currentAuthMode = 'signup';
         title.innerText = 'Create Account';
-        nameGroup.classList.remove('hidden');
-        captchaGroup.classList.remove('hidden'); // Show captcha
-        document.getElementById('fullname').setAttribute('required', 'true');
         submitBtn.innerText = 'Sign Up';
         toggleLink.innerText = "Already have an account? Log In";
+        
+        // Show expanded fields
+        signupOnlyFields.forEach(el => el.classList.remove('hidden'));
+        document.getElementById('fullname').setAttribute('required', 'true');
+        document.getElementById('email').setAttribute('required', 'true');
+        document.getElementById('phone').setAttribute('required', 'true');
     }
+}
+
+// --- OAUTH LOGIC SIMULATOR ---
+function triggerOAuth(provider) {
+    const errorBox = document.getElementById('auth-error');
+    
+    // Aesthetic styling for the handshake simulation
+    errorBox.style.color = "var(--primary)";
+    errorBox.classList.remove('hidden');
+    
+    // Simulate the OAuth redirect sequence
+    errorBox.innerText = `Requesting secure token from ${provider}...`;
+    
+    setTimeout(() => {
+        errorBox.innerText = `Verifying ${provider} credentials...`;
+        
+        setTimeout(() => {
+            // Create a simulated user profile in the UaaO Database
+            const simulatedUid = `${provider.toLowerCase()}_user`;
+            UaaODatabase[simulatedUid] = { 
+                pass: "oauth_token_bypass", 
+                name: `${provider} User`, 
+                email: `user@${provider.toLowerCase()}.com`,
+                phone: "Linked",
+                wallet: 500, 
+                unsettledBooks: 1, 
+                inbox: 0 
+            };
+            
+            // Log the user in
+            localStorage.setItem('bookfair_active_user', `${provider} User`);
+            errorBox.style.color = "var(--error)"; // reset color for next time
+            showLanding();
+        }, 1000);
+    }, 1000);
 }
 
 // --- PASSWORD VISIBILITY TOGGLE ---
@@ -117,13 +152,9 @@ const eyeIcon = document.getElementById('eye-icon');
 const eyeSlashIcon = document.getElementById('eye-slash-icon');
 
 togglePasswordBtn.addEventListener('click', () => {
-    // Check current state
     const isPassword = passwordInput.type === 'password';
-    
-    // Toggle type
     passwordInput.type = isPassword ? 'text' : 'password';
     
-    // Toggle icons
     if (isPassword) {
         eyeIcon.classList.remove('hidden');
         eyeSlashIcon.classList.add('hidden');
@@ -140,11 +171,13 @@ authForm.addEventListener('submit', function(e) {
     const pass = document.getElementById('password').value;
     const errorBox = document.getElementById('auth-error');
     const submitBtn = document.getElementById('auth-submit-btn');
+    errorBox.style.color = "var(--error)"; // Ensure standard red for errors
 
     if (currentAuthMode === 'signup') {
         const fname = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
         
-        // 1. Check hCaptcha token locally
         const captchaToken = hcaptcha.getResponse();
         
         if (captchaToken === "") {
@@ -153,7 +186,6 @@ authForm.addEventListener('submit', function(e) {
             return; 
         }
 
-        // 2. Check the UaaO Database
         if (UaaODatabase[uid]) {
             errorBox.innerText = "User ID already exists.";
             errorBox.classList.remove('hidden');
@@ -164,12 +196,17 @@ authForm.addEventListener('submit', function(e) {
         submitBtn.innerText = "Verifying..."; 
         submitBtn.disabled = true;
 
-        // Simulate server communication latency
         setTimeout(() => {
-            // Save to UaaO Object
-            UaaODatabase[uid] = { pass: pass, name: fname, wallet: 0, unsettledBooks: 0, inbox: 0 };
+            UaaODatabase[uid] = { 
+                pass: pass, 
+                name: fname, 
+                email: email,
+                phone: phone,
+                wallet: 0, 
+                unsettledBooks: 0, 
+                inbox: 0 
+            };
             
-            // Keep user session active
             localStorage.setItem('bookfair_active_user', fname);
             
             authForm.reset();
@@ -183,7 +220,6 @@ authForm.addEventListener('submit', function(e) {
         }, 1200);
 
     } else {
-        // Login Flow (Checking UaaO Object instead of MongoDB)
         if (UaaODatabase[uid] && UaaODatabase[uid].pass === pass) {
             localStorage.setItem('bookfair_active_user', UaaODatabase[uid].name);
             authForm.reset();
@@ -198,14 +234,13 @@ authForm.addEventListener('submit', function(e) {
     }
 });
 
-// WIPE DATA ON LOGOUT
 function signOut() {
     localStorage.removeItem('bookfair_active_user');
     authForm.reset(); 
     document.getElementById('password').type = 'password';
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
-    if (currentAuthMode === 'login') toggleAuthMode(); // Reset to default Signup state
+    if (currentAuthMode === 'login') toggleAuthMode(); 
     checkAuthState();
 }
 
