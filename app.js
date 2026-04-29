@@ -69,6 +69,9 @@ function showAuth(mode) {
 function showLanding() {
     authForm.reset(); // WIPE DATA
     document.getElementById('auth-error').classList.add('hidden');
+    document.getElementById('password').type = 'password'; // Reset to hidden
+    document.getElementById('eye-icon').classList.add('hidden');
+    document.getElementById('eye-slash-icon').classList.remove('hidden');
     checkAuthState();
 }
 
@@ -82,6 +85,9 @@ function toggleAuthMode() {
     // SECURITY: Wipe form on toggle
     authForm.reset();
     document.getElementById('auth-error').classList.add('hidden');
+    document.getElementById('password').type = 'password'; // Reset visibility on toggle
+    document.getElementById('eye-icon').classList.add('hidden');
+    document.getElementById('eye-slash-icon').classList.remove('hidden');
 
     if (currentAuthMode === 'signup') {
         // Switch to LOGIN
@@ -103,6 +109,29 @@ function toggleAuthMode() {
         toggleLink.innerText = "Already have an account? Log In";
     }
 }
+
+// --- PASSWORD VISIBILITY TOGGLE ---
+const togglePasswordBtn = document.getElementById('toggle-password');
+const passwordInput = document.getElementById('password');
+const eyeIcon = document.getElementById('eye-icon');
+const eyeSlashIcon = document.getElementById('eye-slash-icon');
+
+togglePasswordBtn.addEventListener('click', () => {
+    // Check current state
+    const isPassword = passwordInput.type === 'password';
+    
+    // Toggle type
+    passwordInput.type = isPassword ? 'text' : 'password';
+    
+    // Toggle icons
+    if (isPassword) {
+        eyeIcon.classList.remove('hidden');
+        eyeSlashIcon.classList.add('hidden');
+    } else {
+        eyeIcon.classList.add('hidden');
+        eyeSlashIcon.classList.remove('hidden');
+    }
+});
 
 // Handle Form Submission Logic using UaaO Architecture
 authForm.addEventListener('submit', function(e) {
@@ -144,6 +173,9 @@ authForm.addEventListener('submit', function(e) {
             localStorage.setItem('bookfair_active_user', fname);
             
             authForm.reset();
+            document.getElementById('password').type = 'password';
+            document.getElementById('eye-icon').classList.add('hidden');
+            document.getElementById('eye-slash-icon').classList.remove('hidden');
             hcaptcha.reset(); 
             submitBtn.innerText = "Sign Up";
             submitBtn.disabled = false;
@@ -155,6 +187,9 @@ authForm.addEventListener('submit', function(e) {
         if (UaaODatabase[uid] && UaaODatabase[uid].pass === pass) {
             localStorage.setItem('bookfair_active_user', UaaODatabase[uid].name);
             authForm.reset();
+            document.getElementById('password').type = 'password';
+            document.getElementById('eye-icon').classList.add('hidden');
+            document.getElementById('eye-slash-icon').classList.remove('hidden');
             checkAuthState();
         } else {
             errorBox.innerText = "Invalid User ID or Password.";
@@ -167,6 +202,9 @@ authForm.addEventListener('submit', function(e) {
 function signOut() {
     localStorage.removeItem('bookfair_active_user');
     authForm.reset(); 
+    document.getElementById('password').type = 'password';
+    document.getElementById('eye-icon').classList.add('hidden');
+    document.getElementById('eye-slash-icon').classList.remove('hidden');
     if (currentAuthMode === 'login') toggleAuthMode(); // Reset to default Signup state
     checkAuthState();
 }
