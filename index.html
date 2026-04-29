@@ -6,7 +6,8 @@
     <title>Bookfair | Read & Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-    <link rel="stylesheet" href="style.css?v=2">
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -129,6 +130,12 @@
                         <div class="input-group signup-only">
                             <label>Phone Number</label>
                             <input type="tel" id="phone" placeholder="+91 98765 43210">
+                        </div>
+                        
+                        <div class="input-group signup-only">
+                            <label>Payment Method (Secure)</label>
+                            <div id="card-element" class="stripe-box"></div>
+                            <div id="card-errors" class="error-msg hidden" style="margin-top: 5px;"></div>
                         </div>
                         <div class="input-group">
                             <label>User ID</label>
@@ -259,6 +266,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>
