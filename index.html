@@ -6,10 +6,9 @@
     <title>Bookfair | Read & Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
     
-    <!-- Stripe & Cloudflare Turnstile Scripts -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -28,6 +27,12 @@
                 <div class="nav-controls">
                     <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">Dark Mode</button>
                     <button class="auth-nav-btn" id="nav-auth-btn" onclick="showAuth('signup')">Sign Up</button>
+                    
+                    <!-- THE UNKNOWN MAN AVATAR -->
+                    <a href="profile.html" class="profile-avatar hidden" id="nav-profile-avatar" title="My Profile">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </a>
+                    
                     <button class="logout-btn hidden" id="nav-logout-btn" onclick="signOut()">Disconnect</button>
                 </div>
             </nav>
@@ -119,7 +124,6 @@
                     <form id="auth-form">
                         <div id="auth-error" class="error-msg hidden">Invalid details provided.</div>
                         
-                        <!-- EXPANDED SIGNUP FIELDS -->
                         <div class="input-group signup-only">
                             <label>Full Name</label>
                             <input type="text" id="fullname" placeholder="Enter your full name">
@@ -135,7 +139,6 @@
                             <input type="tel" id="phone" placeholder="+91 98765 43210">
                         </div>
 
-                        <!-- LOCATION DATA -->
                         <div class="input-group signup-only">
                             <label>Shipping Address</label>
                             <input type="text" id="address1" placeholder="Street Address" style="margin-bottom: 10px;">
@@ -147,7 +150,6 @@
                             </div>
                         </div>
                         
-                        <!-- MULTI-PAYMENT ENGINE -->
                         <div class="input-group signup-only">
                             <label>Payment Method</label>
                             
@@ -207,7 +209,6 @@
                             </div>
                         </div>
                         
-                        <!-- LIVE CLOUDFLARE TURNSTILE WIDGET -->
                         <div class="turnstile-container signup-only" id="captcha-container">
                             <div class="cf-turnstile" data-sitekey="0x4AAAAAADIhaz7yIwYBvuiq" data-theme="auto"></div>
                         </div>
@@ -321,6 +322,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
 </body>
 </html>
