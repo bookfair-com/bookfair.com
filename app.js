@@ -1,18 +1,7 @@
-// --- 0. UaaO (User-as-an-Object) ARCHITECTURE ---
-const UaaODatabase = {
-    "alekhyo_0812": { 
-        pass: "bookfair@test", 
-        name: "Alekhyo Biswas",
-        email: "alekhyo@example.com",
-        phone: "+91 00000 00000",
-        address: "HQ",
-        wallet: 1450,
-        unsettledBooks: 4,
-        inbox: 2
-    }
-};
+// --- BACKEND CONNECTION ---
+const SERVER_URL = "https://bookfair-server.onrender.com";
 
-// --- STRIPE SECURE PAYMENT INITIALIZATION (SPLIT ELEMENTS) ---
+// --- STRIPE SECURE PAYMENT INITIALIZATION ---
 const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx'); 
 const elements = stripe.elements();
 
@@ -40,7 +29,7 @@ const btnLogout = document.getElementById('nav-logout-btn');
 const authForm = document.getElementById('auth-form');
 
 let currentAuthMode = 'signup'; 
-let currentPayMethod = 'card'; // Tracks active payment tab
+let currentPayMethod = 'card'; 
 
 function checkAuthState() {
     const activeUser = localStorage.getItem('bookfair_active_user');
@@ -93,6 +82,7 @@ function showLanding() {
     cardNumber.clear();
     cardExpiry.clear();
     cardCvc.clear();
+    turnstile.reset();
     
     checkAuthState();
 }
@@ -103,7 +93,7 @@ function toggleAuthMode() {
     const toggleLink = document.getElementById('auth-toggle-link');
     const signupOnlyFields = document.querySelectorAll('.signup-only');
 
-    const signupInputIds = ['fullname', 'email', 'phone']; // Minimal requirements
+    const signupInputIds = ['fullname', 'email', 'phone']; 
 
     authForm.reset();
     document.getElementById('auth-error').classList.add('hidden');
@@ -131,6 +121,7 @@ function toggleAuthMode() {
         
         signupOnlyFields.forEach(el => el.classList.remove('hidden'));
         signupInputIds.forEach(id => document.getElementById(id).setAttribute('required', 'true'));
+        turnstile.reset();
     }
 }
 
@@ -144,11 +135,9 @@ const paySections = {
 
 payTabs.forEach(tab => {
     tab.addEventListener('click', function() {
-        // Reset all tabs
         payTabs.forEach(t => t.classList.remove('active'));
         Object.values(paySections).forEach(s => s.classList.add('hidden'));
 
-        // Activate the clicked one
         this.classList.add('active');
         currentPayMethod = this.querySelector('input').value;
         paySections[currentPayMethod].classList.remove('hidden');
@@ -165,17 +154,6 @@ function triggerOAuth(provider) {
     setTimeout(() => {
         errorBox.innerText = `Verifying ${provider} credentials...`;
         setTimeout(() => {
-            const simulatedUid = `${provider.toLowerCase()}_user`;
-            UaaODatabase[simulatedUid] = { 
-                pass: "oauth_token_bypass", 
-                name: `${provider} User`, 
-                email: `user@${provider.toLowerCase()}.com`,
-                phone: "Linked",
-                wallet: 500, 
-                unsettledBooks: 1, 
-                inbox: 0 
-            };
-            
             localStorage.setItem('bookfair_active_user', `${provider} User`);
             errorBox.style.color = "var(--error)"; 
             showLanding();
@@ -202,8 +180,8 @@ togglePasswordBtn.addEventListener('click', () => {
     }
 });
 
-// Handle Form Submission Logic using UaaO Architecture
-authForm.addEventListener('submit', function(e) {
+// --- LIVE BACKEND FETCH LOGIC ---
+authForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     const uid = document.getElementById('userid').value.trim();
     const pass = document.getElementById('password').value;
@@ -224,7 +202,8 @@ authForm.addEventListener('submit', function(e) {
             zip: document.getElementById('zip').value.trim()
         };
         
-        const captchaToken = hcaptcha.getResponse();
+        // Grab the Cloudflare Turnstile token
+        const captchaToken = turnstile.getResponse();
         
         if (captchaToken === "") {
             errorBox.innerText = "Please complete the security check.";
@@ -232,51 +211,52 @@ authForm.addEventListener('submit', function(e) {
             return; 
         }
 
-        if (UaaODatabase[uid]) {
-            errorBox.innerText = "User ID already exists.";
-            errorBox.classList.remove('hidden');
-            hcaptcha.reset(); 
-            return;
-        }
-
         submitBtn.innerText = "Encrypting..."; 
         submitBtn.disabled = true;
 
-        // Function to finalize signup after getting token
-        const finalizeSignup = (secureToken) => {
-            console.log(`SUCCESS! Token Generated [${currentPayMethod}]:`, secureToken);
-            
-            setTimeout(() => {
-                UaaODatabase[uid] = { 
-                    pass: pass, 
-                    name: fname, 
-                    email: email,
-                    phone: phone,
-                    address: `${locationData.line1}, ${locationData.city}`,
-                    paymentToken: secureToken,
-                    paymentMethod: currentPayMethod,
-                    wallet: 0, 
-                    unsettledBooks: 0, 
-                    inbox: 0 
-                };
-                
-                localStorage.setItem('bookfair_active_user', fname);
-                
-                authForm.reset();
-                cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
-                
-                document.getElementById('password').type = 'password';
-                document.getElementById('eye-icon').classList.add('hidden');
-                document.getElementById('eye-slash-icon').classList.remove('hidden');
-                hcaptcha.reset(); 
-                
+        // Step 1: Execute Backend Fetch Call
+        const executeServerSignup = async (secureToken) => {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userid: uid,
+                        password: pass,
+                        fullname: fname,
+                        email: email,
+                        phone: phone,
+                        address: locationData,
+                        paymentMethod: currentPayMethod,
+                        paymentToken: secureToken,
+                        captchaToken: captchaToken
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('bookfair_active_user', fname);
+                    authForm.reset();
+                    cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+                    turnstile.reset();
+                    checkAuthState();
+                } else {
+                    errorBox.innerText = data.message;
+                    errorBox.classList.remove('hidden');
+                    turnstile.reset();
+                }
+            } catch (error) {
+                errorBox.innerText = "Could not connect to the Bookfair server.";
+                errorBox.classList.remove('hidden');
+                turnstile.reset();
+            } finally {
                 submitBtn.innerText = "Sign Up";
                 submitBtn.disabled = false;
-                checkAuthState();
-            }, 1200);
+            }
         };
 
-        // Payment Routing Logic
+        // Step 2: Payment Routing & Token Generation
         if (currentPayMethod === 'card') {
             stripe.createToken(cardNumber, {
                 name: fname, address_line1: locationData.line1, address_line2: locationData.line2,
@@ -287,9 +267,9 @@ authForm.addEventListener('submit', function(e) {
                     errorBox.classList.remove('hidden');
                     submitBtn.innerText = "Sign Up";
                     submitBtn.disabled = false;
-                    hcaptcha.reset();
+                    turnstile.reset();
                 } else {
-                    finalizeSignup(result.token.id);
+                    executeServerSignup(result.token.id);
                 }
             });
         } else if (currentPayMethod === 'upi') {
@@ -299,9 +279,10 @@ authForm.addEventListener('submit', function(e) {
                 errorBox.classList.remove('hidden');
                 submitBtn.innerText = "Sign Up";
                 submitBtn.disabled = false;
+                turnstile.reset();
                 return;
             }
-            finalizeSignup(`tok_upi_${btoa(upiId).substring(0,10)}`);
+            executeServerSignup(`tok_upi_${btoa(upiId).substring(0,10)}`);
         } else if (currentPayMethod === 'netbanking') {
             const bank = document.getElementById('bank-select').value;
             if(!bank) {
@@ -309,22 +290,42 @@ authForm.addEventListener('submit', function(e) {
                 errorBox.classList.remove('hidden');
                 submitBtn.innerText = "Sign Up";
                 submitBtn.disabled = false;
+                turnstile.reset();
                 return;
             }
-            finalizeSignup(`tok_netbank_${bank}`);
+            executeServerSignup(`tok_netbank_${bank}`);
         }
 
     } else {
-        if (UaaODatabase[uid] && UaaODatabase[uid].pass === pass) {
-            localStorage.setItem('bookfair_active_user', UaaODatabase[uid].name);
-            authForm.reset();
-            document.getElementById('password').type = 'password';
-            document.getElementById('eye-icon').classList.add('hidden');
-            document.getElementById('eye-slash-icon').classList.remove('hidden');
-            checkAuthState();
-        } else {
-            errorBox.innerText = "Invalid User ID or Password.";
+        // LIVE LOGIN FETCH
+        submitBtn.innerText = "Authenticating...";
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${SERVER_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userid: uid, password: pass })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                localStorage.setItem('bookfair_active_user', data.fullname);
+                authForm.reset();
+                document.getElementById('password').type = 'password';
+                document.getElementById('eye-icon').classList.add('hidden');
+                document.getElementById('eye-slash-icon').classList.remove('hidden');
+                checkAuthState();
+            } else {
+                errorBox.innerText = data.message;
+                errorBox.classList.remove('hidden');
+            }
+        } catch (error) {
+            errorBox.innerText = "Could not connect to the Bookfair server.";
             errorBox.classList.remove('hidden');
+        } finally {
+            submitBtn.innerText = "Log In";
+            submitBtn.disabled = false;
         }
     }
 });
