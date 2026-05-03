@@ -27,7 +27,6 @@ const elementStyles = {
     invalid: { color: '#ff4757', iconColor: '#ff4757' }
 };
 
-// Create the three separate components
 const cardNumber = elements.create('cardNumber', { style: elementStyles });
 const cardExpiry = elements.create('cardExpiry', { style: elementStyles });
 const cardCvc = elements.create('cardCvc', { style: elementStyles });
@@ -41,6 +40,7 @@ const btnLogout = document.getElementById('nav-logout-btn');
 const authForm = document.getElementById('auth-form');
 
 let currentAuthMode = 'signup'; 
+let currentPayMethod = 'card'; // Tracks active payment tab
 
 function checkAuthState() {
     const activeUser = localStorage.getItem('bookfair_active_user');
@@ -103,8 +103,7 @@ function toggleAuthMode() {
     const toggleLink = document.getElementById('auth-toggle-link');
     const signupOnlyFields = document.querySelectorAll('.signup-only');
 
-    // List of inputs that require specific handling
-    const signupInputIds = ['fullname', 'email', 'phone', 'address1', 'city', 'state', 'zip'];
+    const signupInputIds = ['fullname', 'email', 'phone']; // Minimal requirements
 
     authForm.reset();
     document.getElementById('auth-error').classList.add('hidden');
@@ -117,7 +116,6 @@ function toggleAuthMode() {
     cardCvc.clear();
 
     if (currentAuthMode === 'signup') {
-        // Switch to LOGIN
         currentAuthMode = 'login';
         title.innerText = 'Welcome Back';
         submitBtn.innerText = 'Log In';
@@ -126,7 +124,6 @@ function toggleAuthMode() {
         signupOnlyFields.forEach(el => el.classList.add('hidden'));
         signupInputIds.forEach(id => document.getElementById(id).removeAttribute('required'));
     } else {
-        // Switch to SIGNUP
         currentAuthMode = 'signup';
         title.innerText = 'Create Account';
         submitBtn.innerText = 'Sign Up';
@@ -136,6 +133,27 @@ function toggleAuthMode() {
         signupInputIds.forEach(id => document.getElementById(id).setAttribute('required', 'true'));
     }
 }
+
+// --- PAYMENT METHOD TOGGLE LOGIC ---
+const payTabs = document.querySelectorAll('.pay-tab');
+const paySections = {
+    card: document.getElementById('pay-card'),
+    upi: document.getElementById('pay-upi'),
+    netbanking: document.getElementById('pay-netbanking')
+};
+
+payTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Reset all tabs
+        payTabs.forEach(t => t.classList.remove('active'));
+        Object.values(paySections).forEach(s => s.classList.add('hidden'));
+
+        // Activate the clicked one
+        this.classList.add('active');
+        currentPayMethod = this.querySelector('input').value;
+        paySections[currentPayMethod].classList.remove('hidden');
+    });
+});
 
 // --- OAUTH LOGIC SIMULATOR ---
 function triggerOAuth(provider) {
@@ -198,7 +216,6 @@ authForm.addEventListener('submit', function(e) {
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
         
-        // Grab the location data
         const locationData = {
             line1: document.getElementById('address1').value.trim(),
             line2: document.getElementById('address2').value.trim(),
@@ -225,56 +242,77 @@ authForm.addEventListener('submit', function(e) {
         submitBtn.innerText = "Encrypting..."; 
         submitBtn.disabled = true;
 
-        // 1. Pass the location data along with the card number to Stripe for extra verification!
-        stripe.createToken(cardNumber, {
-            name: fname,
-            address_line1: locationData.line1,
-            address_line2: locationData.line2,
-            address_city: locationData.city,
-            address_state: locationData.state,
-            address_zip: locationData.zip
-        }).then(function(result) {
-            if (result.error) {
-                errorBox.innerText = result.error.message;
+        // Function to finalize signup after getting token
+        const finalizeSignup = (secureToken) => {
+            console.log(`SUCCESS! Token Generated [${currentPayMethod}]:`, secureToken);
+            
+            setTimeout(() => {
+                UaaODatabase[uid] = { 
+                    pass: pass, 
+                    name: fname, 
+                    email: email,
+                    phone: phone,
+                    address: `${locationData.line1}, ${locationData.city}`,
+                    paymentToken: secureToken,
+                    paymentMethod: currentPayMethod,
+                    wallet: 0, 
+                    unsettledBooks: 0, 
+                    inbox: 0 
+                };
+                
+                localStorage.setItem('bookfair_active_user', fname);
+                
+                authForm.reset();
+                cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+                
+                document.getElementById('password').type = 'password';
+                document.getElementById('eye-icon').classList.add('hidden');
+                document.getElementById('eye-slash-icon').classList.remove('hidden');
+                hcaptcha.reset(); 
+                
+                submitBtn.innerText = "Sign Up";
+                submitBtn.disabled = false;
+                checkAuthState();
+            }, 1200);
+        };
+
+        // Payment Routing Logic
+        if (currentPayMethod === 'card') {
+            stripe.createToken(cardNumber, {
+                name: fname, address_line1: locationData.line1, address_line2: locationData.line2,
+                address_city: locationData.city, address_state: locationData.state, address_zip: locationData.zip
+            }).then(function(result) {
+                if (result.error) {
+                    errorBox.innerText = result.error.message;
+                    errorBox.classList.remove('hidden');
+                    submitBtn.innerText = "Sign Up";
+                    submitBtn.disabled = false;
+                    hcaptcha.reset();
+                } else {
+                    finalizeSignup(result.token.id);
+                }
+            });
+        } else if (currentPayMethod === 'upi') {
+            const upiId = document.getElementById('upi-id').value.trim();
+            if(!upiId.includes('@')) {
+                errorBox.innerText = "Please enter a valid UPI ID (e.g. name@bank)";
                 errorBox.classList.remove('hidden');
                 submitBtn.innerText = "Sign Up";
                 submitBtn.disabled = false;
-                hcaptcha.reset();
-            } else {
-                const securePaymentToken = result.token.id;
-                console.log("SUCCESS! Split-Stripe Token Generated:", securePaymentToken);
-                
-                setTimeout(() => {
-                    UaaODatabase[uid] = { 
-                        pass: pass, 
-                        name: fname, 
-                        email: email,
-                        phone: phone,
-                        address: `${locationData.line1}, ${locationData.city}`,
-                        stripeToken: securePaymentToken,
-                        wallet: 0, 
-                        unsettledBooks: 0, 
-                        inbox: 0 
-                    };
-                    
-                    localStorage.setItem('bookfair_active_user', fname);
-                    
-                    authForm.reset();
-                    cardNumber.clear();
-                    cardExpiry.clear();
-                    cardCvc.clear();
-                    
-                    document.getElementById('password').type = 'password';
-                    document.getElementById('eye-icon').classList.add('hidden');
-                    document.getElementById('eye-slash-icon').classList.remove('hidden');
-                    hcaptcha.reset(); 
-                    
-                    submitBtn.innerText = "Sign Up";
-                    submitBtn.disabled = false;
-                    checkAuthState();
-                }, 1200);
+                return;
             }
-        });
+            finalizeSignup(`tok_upi_${btoa(upiId).substring(0,10)}`);
+        } else if (currentPayMethod === 'netbanking') {
+            const bank = document.getElementById('bank-select').value;
+            if(!bank) {
+                errorBox.innerText = "Please select a bank for NetBanking.";
+                errorBox.classList.remove('hidden');
+                submitBtn.innerText = "Sign Up";
+                submitBtn.disabled = false;
+                return;
+            }
+            finalizeSignup(`tok_netbank_${bank}`);
+        }
 
     } else {
         if (UaaODatabase[uid] && UaaODatabase[uid].pass === pass) {
@@ -298,9 +336,7 @@ function signOut() {
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
     
-    cardNumber.clear();
-    cardExpiry.clear();
-    cardCvc.clear();
+    cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
     
     if (currentAuthMode === 'login') toggleAuthMode(); 
     checkAuthState();
@@ -319,7 +355,6 @@ function toggleTheme() {
     }
     updateParticleColors();
     
-    // Update all three Stripe elements to match theme
     const isDark = root.getAttribute('data-theme') === 'dark';
     const newStyle = { style: { base: { color: isDark ? '#f8fafc' : '#0f172a' } } };
     cardNumber.update(newStyle);
@@ -414,7 +449,6 @@ window.addEventListener('load', () => {
     canvas.height = window.innerHeight;
     checkAuthState(); 
     
-    // Mount all three Split Stripe Elements!
     cardNumber.mount('#card-number');
     cardExpiry.mount('#card-expiry');
     cardCvc.mount('#card-cvc');
