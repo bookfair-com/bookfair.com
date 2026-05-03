@@ -26,73 +26,107 @@ const vAuth = document.getElementById('view-auth');
 const vDashboard = document.getElementById('view-dashboard');
 const btnNavAuth = document.getElementById('nav-auth-btn');
 const btnLogout = document.getElementById('nav-logout-btn');
+const btnProfile = document.getElementById('nav-profile-avatar');
 const authForm = document.getElementById('auth-form');
+
+const isProfilePage = document.getElementById('profile-page-marker') !== null;
+const isIndexPage = vLanding !== null;
 
 let currentAuthMode = 'signup'; 
 let currentPayMethod = 'card'; 
 
 function checkAuthState() {
-    const activeUser = localStorage.getItem('bookfair_active_user');
+    // We now store the entire User Object stringified!
+    const activeUserData = localStorage.getItem('bookfair_user_data');
     
-    if (activeUser) {
-        const firstName = activeUser.split(' ')[0];
-        document.getElementById('dash-greeting').innerText = `Welcome back, ${firstName}.`;
+    if (activeUserData) {
+        const user = JSON.parse(activeUserData);
+        
+        // Universal Nav Updates
+        if (btnNavAuth) btnNavAuth.classList.add('hidden');
+        if (btnLogout) btnLogout.classList.remove('hidden');
+        if (btnProfile) btnProfile.classList.remove('hidden');
 
-        vLanding.classList.add('hidden');
-        vAuth.classList.add('hidden');
-        btnNavAuth.classList.add('hidden');
-        vDashboard.classList.remove('hidden');
-        btnLogout.classList.remove('hidden');
-        
-        canvas.style.display = 'none';
-        if(animationFrameId) {
-            cancelAnimationFrame(animationFrameId); 
-            animationFrameId = null;
+        if (isIndexPage) {
+            const firstName = user.fullname.split(' ')[0];
+            document.getElementById('dash-greeting').innerText = `Welcome back, ${firstName}.`;
+
+            vLanding.classList.add('hidden');
+            vAuth.classList.add('hidden');
+            vDashboard.classList.remove('hidden');
+            
+            canvas.style.display = 'none';
+            if(animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
         }
+
+        if (isProfilePage) {
+            // Populate the Profile HTML
+            document.getElementById('prof-fullname').innerText = user.fullname;
+            document.getElementById('prof-userid').innerText = `@${user.userid}`;
+            document.getElementById('prof-wallet').innerText = `₹${user.wallet ? user.wallet.toFixed(2) : '0.00'}`;
+            document.getElementById('prof-email').innerText = user.email || 'Not provided';
+            document.getElementById('prof-phone').innerText = user.phone || 'Not provided';
+            document.getElementById('prof-payment').innerText = user.paymentMethod || 'None';
+
+            if (user.address && user.address.line1) {
+                document.getElementById('prof-address').innerText = `${user.address.line1}, ${user.address.city}, ${user.address.state} ${user.address.zip}`;
+            } else {
+                document.getElementById('prof-address').innerText = 'Not provided';
+            }
+        }
+
     } else {
-        vDashboard.classList.add('hidden');
-        vAuth.classList.add('hidden');
-        btnLogout.classList.add('hidden');
-        vLanding.classList.remove('hidden');
-        btnNavAuth.classList.remove('hidden');
-        
-        canvas.style.display = 'block';
-        resize();
-        if (!animationFrameId) animate();
+        // NOT LOGGED IN
+        if (isProfilePage) {
+            // Security kickout - prevent viewing profile without login
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (isIndexPage) {
+            vDashboard.classList.add('hidden');
+            vAuth.classList.add('hidden');
+            btnLogout.classList.add('hidden');
+            if (btnProfile) btnProfile.classList.add('hidden');
+            vLanding.classList.remove('hidden');
+            btnNavAuth.classList.remove('hidden');
+            
+            canvas.style.display = 'block';
+            resize();
+            if (!animationFrameId) animate();
+        }
     }
 }
 
 function showAuth(mode) {
-    vLanding.classList.add('hidden');
-    vAuth.classList.remove('hidden');
-    btnNavAuth.classList.add('hidden');
-    
-    if(mode && mode !== currentAuthMode) {
-        toggleAuthMode();
+    if (isIndexPage) {
+        vLanding.classList.add('hidden');
+        vAuth.classList.remove('hidden');
+        btnNavAuth.classList.add('hidden');
+        if(mode && mode !== currentAuthMode) toggleAuthMode();
     }
 }
 
 function showLanding() {
-    authForm.reset(); 
-    document.getElementById('auth-error').classList.add('hidden');
-    document.getElementById('password').type = 'password'; 
-    document.getElementById('eye-icon').classList.add('hidden');
-    document.getElementById('eye-slash-icon').classList.remove('hidden');
-    
-    cardNumber.clear();
-    cardExpiry.clear();
-    cardCvc.clear();
-    turnstile.reset();
-    
+    if (authForm) {
+        authForm.reset(); 
+        document.getElementById('auth-error').classList.add('hidden');
+        document.getElementById('password').type = 'password'; 
+        document.getElementById('eye-icon').classList.add('hidden');
+        document.getElementById('eye-slash-icon').classList.remove('hidden');
+        cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+        turnstile.reset();
+    }
     checkAuthState();
 }
 
 function toggleAuthMode() {
+    if (!authForm) return;
+
     const title = document.getElementById('auth-title');
     const submitBtn = document.getElementById('auth-submit-btn');
     const toggleLink = document.getElementById('auth-toggle-link');
     const signupOnlyFields = document.querySelectorAll('.signup-only');
-
     const signupInputIds = ['fullname', 'email', 'phone']; 
 
     authForm.reset();
@@ -100,17 +134,13 @@ function toggleAuthMode() {
     document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
-    
-    cardNumber.clear();
-    cardExpiry.clear();
-    cardCvc.clear();
+    cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
 
     if (currentAuthMode === 'signup') {
         currentAuthMode = 'login';
         title.innerText = 'Welcome Back';
         submitBtn.innerText = 'Log In';
         toggleLink.innerText = "Don't have an account? Sign Up";
-        
         signupOnlyFields.forEach(el => el.classList.add('hidden'));
         signupInputIds.forEach(id => document.getElementById(id).removeAttribute('required'));
     } else {
@@ -118,7 +148,6 @@ function toggleAuthMode() {
         title.innerText = 'Create Account';
         submitBtn.innerText = 'Sign Up';
         toggleLink.innerText = "Already have an account? Log In";
-        
         signupOnlyFields.forEach(el => el.classList.remove('hidden'));
         signupInputIds.forEach(id => document.getElementById(id).setAttribute('required', 'true'));
         turnstile.reset();
@@ -127,22 +156,23 @@ function toggleAuthMode() {
 
 // --- PAYMENT METHOD TOGGLE LOGIC ---
 const payTabs = document.querySelectorAll('.pay-tab');
-const paySections = {
-    card: document.getElementById('pay-card'),
-    upi: document.getElementById('pay-upi'),
-    netbanking: document.getElementById('pay-netbanking')
-};
+if (payTabs.length > 0) {
+    const paySections = {
+        card: document.getElementById('pay-card'),
+        upi: document.getElementById('pay-upi'),
+        netbanking: document.getElementById('pay-netbanking')
+    };
 
-payTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
-        payTabs.forEach(t => t.classList.remove('active'));
-        Object.values(paySections).forEach(s => s.classList.add('hidden'));
-
-        this.classList.add('active');
-        currentPayMethod = this.querySelector('input').value;
-        paySections[currentPayMethod].classList.remove('hidden');
+    payTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            payTabs.forEach(t => t.classList.remove('active'));
+            Object.values(paySections).forEach(s => s.classList.add('hidden'));
+            this.classList.add('active');
+            currentPayMethod = this.querySelector('input').value;
+            paySections[currentPayMethod].classList.remove('hidden');
+        });
     });
-});
+}
 
 // --- OAUTH LOGIC SIMULATOR ---
 function triggerOAuth(provider) {
@@ -154,7 +184,15 @@ function triggerOAuth(provider) {
     setTimeout(() => {
         errorBox.innerText = `Verifying ${provider} credentials...`;
         setTimeout(() => {
-            localStorage.setItem('bookfair_active_user', `${provider} User`);
+            const mockUser = {
+                userid: `${provider.toLowerCase()}_user`,
+                fullname: `${provider} User`,
+                email: `user@${provider.toLowerCase()}.com`,
+                phone: "Linked",
+                paymentMethod: "Linked Provider",
+                wallet: 500
+            };
+            localStorage.setItem('bookfair_user_data', JSON.stringify(mockUser));
             errorBox.style.color = "var(--error)"; 
             showLanding();
         }, 1000);
@@ -163,184 +201,183 @@ function triggerOAuth(provider) {
 
 // --- PASSWORD VISIBILITY TOGGLE ---
 const togglePasswordBtn = document.getElementById('toggle-password');
-const passwordInput = document.getElementById('password');
-const eyeIcon = document.getElementById('eye-icon');
-const eyeSlashIcon = document.getElementById('eye-slash-icon');
+if (togglePasswordBtn) {
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeSlashIcon = document.getElementById('eye-slash-icon');
 
-togglePasswordBtn.addEventListener('click', () => {
-    const isPassword = passwordInput.type === 'password';
-    passwordInput.type = isPassword ? 'text' : 'password';
-    
-    if (isPassword) {
-        eyeIcon.classList.remove('hidden');
-        eyeSlashIcon.classList.add('hidden');
-    } else {
-        eyeIcon.classList.add('hidden');
-        eyeSlashIcon.classList.remove('hidden');
-    }
-});
+    togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        if (isPassword) {
+            eyeIcon.classList.remove('hidden');
+            eyeSlashIcon.classList.add('hidden');
+        } else {
+            eyeIcon.classList.add('hidden');
+            eyeSlashIcon.classList.remove('hidden');
+        }
+    });
+}
 
 // --- LIVE BACKEND FETCH LOGIC ---
-authForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const uid = document.getElementById('userid').value.trim();
-    const pass = document.getElementById('password').value;
-    const errorBox = document.getElementById('auth-error');
-    const submitBtn = document.getElementById('auth-submit-btn');
-    errorBox.style.color = "var(--error)"; 
+if (authForm) {
+    authForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const uid = document.getElementById('userid').value.trim();
+        const pass = document.getElementById('password').value;
+        const errorBox = document.getElementById('auth-error');
+        const submitBtn = document.getElementById('auth-submit-btn');
+        errorBox.style.color = "var(--error)"; 
 
-    if (currentAuthMode === 'signup') {
-        const fname = document.getElementById('fullname').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        
-        const locationData = {
-            line1: document.getElementById('address1').value.trim(),
-            line2: document.getElementById('address2').value.trim(),
-            city: document.getElementById('city').value.trim(),
-            state: document.getElementById('state').value.trim(),
-            zip: document.getElementById('zip').value.trim()
-        };
-        
-        // Grab the Cloudflare Turnstile token
-        const captchaToken = turnstile.getResponse();
-        
-        if (captchaToken === "") {
-            errorBox.innerText = "Please complete the security check.";
-            errorBox.classList.remove('hidden');
-            return; 
-        }
+        if (currentAuthMode === 'signup') {
+            const fname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            
+            const locationData = {
+                line1: document.getElementById('address1').value.trim(),
+                line2: document.getElementById('address2').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                state: document.getElementById('state').value.trim(),
+                zip: document.getElementById('zip').value.trim()
+            };
+            
+            const captchaToken = turnstile.getResponse();
+            if (captchaToken === "") {
+                errorBox.innerText = "Please complete the security check.";
+                errorBox.classList.remove('hidden');
+                return; 
+            }
 
-        submitBtn.innerText = "Encrypting..."; 
-        submitBtn.disabled = true;
+            submitBtn.innerText = "Encrypting..."; 
+            submitBtn.disabled = true;
 
-        // Step 1: Execute Backend Fetch Call
-        const executeServerSignup = async (secureToken) => {
-            try {
-                const response = await fetch(`${SERVER_URL}/api/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userid: uid,
-                        password: pass,
-                        fullname: fname,
-                        email: email,
-                        phone: phone,
-                        address: locationData,
-                        paymentMethod: currentPayMethod,
-                        paymentToken: secureToken,
-                        captchaToken: captchaToken
-                    })
-                });
+            const executeServerSignup = async (secureToken) => {
+                try {
+                    const response = await fetch(`${SERVER_URL}/api/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userid: uid, password: pass, fullname: fname, email: email,
+                            phone: phone, address: locationData, paymentMethod: currentPayMethod,
+                            paymentToken: secureToken, captchaToken: captchaToken
+                        })
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
-                if (data.success) {
-                    localStorage.setItem('bookfair_active_user', fname);
-                    authForm.reset();
-                    cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
-                    turnstile.reset();
-                    checkAuthState();
-                } else {
-                    errorBox.innerText = data.message;
+                    if (data.success) {
+                        // Store the ENTIRE user object returned by the server
+                        localStorage.setItem('bookfair_user_data', JSON.stringify(data.user));
+                        authForm.reset();
+                        cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+                        turnstile.reset();
+                        checkAuthState();
+                    } else {
+                        errorBox.innerText = data.message;
+                        errorBox.classList.remove('hidden');
+                        turnstile.reset();
+                    }
+                } catch (error) {
+                    errorBox.innerText = "Could not connect to the Bookfair server.";
                     errorBox.classList.remove('hidden');
                     turnstile.reset();
+                } finally {
+                    submitBtn.innerText = "Sign Up";
+                    submitBtn.disabled = false;
                 }
-            } catch (error) {
-                errorBox.innerText = "Could not connect to the Bookfair server.";
-                errorBox.classList.remove('hidden');
-                turnstile.reset();
-            } finally {
-                submitBtn.innerText = "Sign Up";
-                submitBtn.disabled = false;
-            }
-        };
+            };
 
-        // Step 2: Payment Routing & Token Generation
-        if (currentPayMethod === 'card') {
-            stripe.createToken(cardNumber, {
-                name: fname, address_line1: locationData.line1, address_line2: locationData.line2,
-                address_city: locationData.city, address_state: locationData.state, address_zip: locationData.zip
-            }).then(function(result) {
-                if (result.error) {
-                    errorBox.innerText = result.error.message;
+            if (currentPayMethod === 'card') {
+                stripe.createToken(cardNumber, {
+                    name: fname, address_line1: locationData.line1, address_line2: locationData.line2,
+                    address_city: locationData.city, address_state: locationData.state, address_zip: locationData.zip
+                }).then(function(result) {
+                    if (result.error) {
+                        errorBox.innerText = result.error.message;
+                        errorBox.classList.remove('hidden');
+                        submitBtn.innerText = "Sign Up";
+                        submitBtn.disabled = false;
+                        turnstile.reset();
+                    } else { executeServerSignup(result.token.id); }
+                });
+            } else if (currentPayMethod === 'upi') {
+                const upiId = document.getElementById('upi-id').value.trim();
+                if(!upiId.includes('@')) {
+                    errorBox.innerText = "Please enter a valid UPI ID (e.g. name@bank)";
                     errorBox.classList.remove('hidden');
                     submitBtn.innerText = "Sign Up";
                     submitBtn.disabled = false;
                     turnstile.reset();
-                } else {
-                    executeServerSignup(result.token.id);
+                    return;
                 }
-            });
-        } else if (currentPayMethod === 'upi') {
-            const upiId = document.getElementById('upi-id').value.trim();
-            if(!upiId.includes('@')) {
-                errorBox.innerText = "Please enter a valid UPI ID (e.g. name@bank)";
+                executeServerSignup(`tok_upi_${btoa(upiId).substring(0,10)}`);
+            } else if (currentPayMethod === 'netbanking') {
+                const bank = document.getElementById('bank-select').value;
+                if(!bank) {
+                    errorBox.innerText = "Please select a bank for NetBanking.";
+                    errorBox.classList.remove('hidden');
+                    submitBtn.innerText = "Sign Up";
+                    submitBtn.disabled = false;
+                    turnstile.reset();
+                    return;
+                }
+                executeServerSignup(`tok_netbank_${bank}`);
+            }
+
+        } else {
+            // LOGIN LOGIC
+            submitBtn.innerText = "Authenticating...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userid: uid, password: pass })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store the ENTIRE user object returned by the server
+                    localStorage.setItem('bookfair_user_data', JSON.stringify(data.user));
+                    authForm.reset();
+                    document.getElementById('password').type = 'password';
+                    document.getElementById('eye-icon').classList.add('hidden');
+                    document.getElementById('eye-slash-icon').classList.remove('hidden');
+                    checkAuthState();
+                } else {
+                    errorBox.innerText = data.message;
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorBox.innerText = "Could not connect to the Bookfair server.";
                 errorBox.classList.remove('hidden');
-                submitBtn.innerText = "Sign Up";
+            } finally {
+                submitBtn.innerText = "Log In";
                 submitBtn.disabled = false;
-                turnstile.reset();
-                return;
             }
-            executeServerSignup(`tok_upi_${btoa(upiId).substring(0,10)}`);
-        } else if (currentPayMethod === 'netbanking') {
-            const bank = document.getElementById('bank-select').value;
-            if(!bank) {
-                errorBox.innerText = "Please select a bank for NetBanking.";
-                errorBox.classList.remove('hidden');
-                submitBtn.innerText = "Sign Up";
-                submitBtn.disabled = false;
-                turnstile.reset();
-                return;
-            }
-            executeServerSignup(`tok_netbank_${bank}`);
         }
-
-    } else {
-        // LIVE LOGIN FETCH
-        submitBtn.innerText = "Authenticating...";
-        submitBtn.disabled = true;
-
-        try {
-            const response = await fetch(`${SERVER_URL}/api/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userid: uid, password: pass })
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                localStorage.setItem('bookfair_active_user', data.fullname);
-                authForm.reset();
-                document.getElementById('password').type = 'password';
-                document.getElementById('eye-icon').classList.add('hidden');
-                document.getElementById('eye-slash-icon').classList.remove('hidden');
-                checkAuthState();
-            } else {
-                errorBox.innerText = data.message;
-                errorBox.classList.remove('hidden');
-            }
-        } catch (error) {
-            errorBox.innerText = "Could not connect to the Bookfair server.";
-            errorBox.classList.remove('hidden');
-        } finally {
-            submitBtn.innerText = "Log In";
-            submitBtn.disabled = false;
-        }
-    }
-});
+    });
+}
 
 function signOut() {
-    localStorage.removeItem('bookfair_active_user');
-    authForm.reset(); 
-    document.getElementById('password').type = 'password';
-    document.getElementById('eye-icon').classList.add('hidden');
-    document.getElementById('eye-slash-icon').classList.remove('hidden');
+    localStorage.removeItem('bookfair_user_data');
     
-    cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+    if (authForm) {
+        authForm.reset(); 
+        document.getElementById('password').type = 'password';
+        document.getElementById('eye-icon').classList.add('hidden');
+        document.getElementById('eye-slash-icon').classList.remove('hidden');
+        cardNumber.clear(); cardExpiry.clear(); cardCvc.clear();
+    }
     
-    if (currentAuthMode === 'login') toggleAuthMode(); 
-    checkAuthState();
+    if (isProfilePage) {
+        window.location.href = 'index.html'; // Redirect to index if logging out from profile
+    } else {
+        if (currentAuthMode === 'login') toggleAuthMode(); 
+        checkAuthState();
+    }
 }
 
 // --- 2. THEME LOGIC ---
@@ -356,11 +393,13 @@ function toggleTheme() {
     }
     updateParticleColors();
     
-    const isDark = root.getAttribute('data-theme') === 'dark';
-    const newStyle = { style: { base: { color: isDark ? '#f8fafc' : '#0f172a' } } };
-    cardNumber.update(newStyle);
-    cardExpiry.update(newStyle);
-    cardCvc.update(newStyle);
+    if (document.getElementById('card-number')) {
+        const isDark = root.getAttribute('data-theme') === 'dark';
+        const newStyle = { style: { base: { color: isDark ? '#f8fafc' : '#0f172a' } } };
+        cardNumber.update(newStyle);
+        cardExpiry.update(newStyle);
+        cardCvc.update(newStyle);
+    }
 }
 
 // --- 3. 3D TILT & SCROLL OBSERVER ---
@@ -384,7 +423,8 @@ cards.forEach(card => {
 
 // --- 4. SECURE PARTICLE ENGINE ---
 const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
+let ctx;
+if (canvas) ctx = canvas.getContext('2d');
 let particles = [];
 let pColor, lColor;
 let animationFrameId = null;
@@ -410,17 +450,20 @@ class Particle {
 }
 
 function initParticles() {
+    if (!canvas) return;
     particles = []; updateParticleColors();
     const count = (window.innerWidth || 1000) < 768 ? 45 : 120;
     for (let i = 0; i < count; i++) particles.push(new Particle());
 }
 
 function resize() {
+    if (!canvas) return;
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     initParticles();
 }
 
 function drawLines() {
+    if (!canvas) return;
     for (let i = 0; i < particles.length; i++) {
         for (let j = i; j < particles.length; j++) {
             const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y;
@@ -434,7 +477,7 @@ function drawLines() {
 }
 
 function animate() {
-    if (localStorage.getItem('bookfair_active_user')) return; 
+    if (!canvas || localStorage.getItem('bookfair_user_data')) return; 
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => { p.update(); p.draw(); });
@@ -443,14 +486,18 @@ function animate() {
 }
 
 // --- INITIALIZATION ---
-window.addEventListener('resize', () => { if (!localStorage.getItem('bookfair_active_user')) resize(); });
+window.addEventListener('resize', () => { if (!localStorage.getItem('bookfair_user_data')) resize(); });
 window.addEventListener('load', () => { 
     updateParticleColors(); 
-    canvas.width = window.innerWidth; 
-    canvas.height = window.innerHeight;
+    if (canvas) {
+        canvas.width = window.innerWidth; 
+        canvas.height = window.innerHeight;
+    }
     checkAuthState(); 
     
-    cardNumber.mount('#card-number');
-    cardExpiry.mount('#card-expiry');
-    cardCvc.mount('#card-cvc');
+    if (document.getElementById('card-number')) {
+        cardNumber.mount('#card-number');
+        cardExpiry.mount('#card-expiry');
+        cardCvc.mount('#card-cvc');
+    }
 });
