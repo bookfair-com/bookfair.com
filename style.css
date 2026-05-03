@@ -132,14 +132,22 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 /* Input Fields & Layout Utilities */
 .input-group { margin-bottom: 20px; }
 .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
-.input-group input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid var(--border); background: rgba(0,0,0,0.05); color: var(--text); font-family: 'Exo 2'; font-size: 1rem; transition: border-color 0.3s; }
-[data-theme="dark"] .input-group input { background: rgba(255,255,255,0.05); }
-.input-group input:focus { outline: none; border-color: var(--primary); }
+.input-group input, .custom-pay-input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid var(--border); background: rgba(0,0,0,0.05); color: var(--text); font-family: 'Exo 2'; font-size: 1rem; transition: border-color 0.3s; }
+[data-theme="dark"] .input-group input, [data-theme="dark"] .custom-pay-input { background: rgba(255,255,255,0.05); }
+.input-group input:focus, .custom-pay-input:focus { outline: none; border-color: var(--primary); }
 
 /* Multi-Column Form Layouts */
 .form-row { display: flex; gap: 10px; width: 100%; }
 .form-col { flex: 1; }
 .form-col-2 { flex: 2; }
+
+/* Payment Tabs */
+.payment-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+.pay-tab { flex: 1; text-align: center; padding: 12px 5px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 700; font-size: 0.85rem; color: var(--text); opacity: 0.6; }
+.pay-tab input { display: none; }
+.pay-tab:hover { border-color: var(--primary); opacity: 1; }
+.pay-tab.active { background: var(--primary); color: white; border-color: var(--primary); opacity: 1; }
+.pay-section { display: block; }
 
 /* Password Field Upgrades */
 .password-wrapper { position: relative; display: flex; align-items: center; }
@@ -157,9 +165,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     background: rgba(0,0,0,0.05); 
     transition: border-color 0.3s;
 }
-[data-theme="dark"] .stripe-box { 
-    background: rgba(255,255,255,0.05); 
-}
+[data-theme="dark"] .stripe-box { background: rgba(255,255,255,0.05); }
 .stripe-box.StripeElement--focus { border-color: var(--primary); }
 .stripe-box.StripeElement--invalid { border-color: var(--error); }
 
