@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookfair | Read & Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <!-- Secure hCaptcha & Stripe Scripts -->
-    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    
+    <!-- Stripe & Cloudflare Turnstile Scripts -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 
@@ -91,7 +92,6 @@
                     <h2 id="auth-title">Create Account</h2>
                     
                     <div class="social-auth">
-                        <!-- All 5 Social Providers -->
                         <button type="button" class="social-btn" onclick="triggerOAuth('Google')">
                             <svg class="social-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                             Continue with Google
@@ -151,7 +151,6 @@
                         <div class="input-group signup-only">
                             <label>Payment Method</label>
                             
-                            <!-- Payment Tabs -->
                             <div class="payment-tabs">
                                 <label class="pay-tab active">
                                     <input type="radio" name="pay_method" value="card" checked> Card
@@ -164,7 +163,6 @@
                                 </label>
                             </div>
 
-                            <!-- 1. Card Section (Stripe) -->
                             <div id="pay-card" class="pay-section">
                                 <div id="card-number" class="stripe-box" style="margin-bottom: 10px;"></div>
                                 <div class="form-row">
@@ -174,13 +172,11 @@
                                 <div id="card-errors" class="error-msg hidden" style="margin-top: 5px;"></div>
                             </div>
 
-                            <!-- 2. UPI Section -->
                             <div id="pay-upi" class="pay-section hidden">
                                 <input type="text" id="upi-id" placeholder="username@bank" class="custom-pay-input">
                                 <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">A payment request will be sent to this UPI ID.</p>
                             </div>
 
-                            <!-- 3. NetBanking Section -->
                             <div id="pay-netbanking" class="pay-section hidden">
                                 <select id="bank-select" class="custom-pay-input">
                                     <option value="" disabled selected>Select your Bank...</option>
@@ -194,7 +190,6 @@
                                 <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">You will be redirected to your bank's portal.</p>
                             </div>
                         </div>
-                        <!-- END EXPANDED FIELDS -->
 
                         <div class="input-group">
                             <label>User ID</label>
@@ -212,8 +207,9 @@
                             </div>
                         </div>
                         
-                        <div class="h-captcha-container signup-only" id="captcha-container">
-                            <div class="h-captcha" data-sitekey="3046bd18-21ce-48e8-85e8-c28cc082340e"></div>
+                        <!-- LIVE CLOUDFLARE TURNSTILE WIDGET -->
+                        <div class="turnstile-container signup-only" id="captcha-container">
+                            <div class="cf-turnstile" data-sitekey="0x4AAAAAADIhaz7yIwYBvuiq" data-theme="auto"></div>
                         </div>
 
                         <button type="submit" class="submit-btn" id="auth-submit-btn">Sign Up</button>
@@ -320,12 +316,11 @@
             </div>
 
             <footer>
-                (c) Alekhyo Biswas – May 3, 2026
+                (c) Alekhyo Biswas 2026
             </footer>
         </div>
     </div>
 
-    <!-- Added ?v=6 to force your phone to download the new app.js! -->
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=8"></script>
 </body>
 </html>
