@@ -129,12 +129,17 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .divider { display: flex; align-items: center; text-align: center; margin-bottom: 25px; color: var(--text); opacity: 0.6; font-size: 0.9rem; font-weight: 700; }
 .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); margin: 0 10px; }
 
-/* Input Fields */
+/* Input Fields & Layout Utilities */
 .input-group { margin-bottom: 20px; }
 .input-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
 .input-group input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid var(--border); background: rgba(0,0,0,0.05); color: var(--text); font-family: 'Exo 2'; font-size: 1rem; transition: border-color 0.3s; }
 [data-theme="dark"] .input-group input { background: rgba(255,255,255,0.05); }
 .input-group input:focus { outline: none; border-color: var(--primary); }
+
+/* Multi-Column Form Layouts */
+.form-row { display: flex; gap: 10px; width: 100%; }
+.form-col { flex: 1; }
+.form-col-2 { flex: 2; }
 
 /* Password Field Upgrades */
 .password-wrapper { position: relative; display: flex; align-items: center; }
@@ -155,12 +160,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 [data-theme="dark"] .stripe-box { 
     background: rgba(255,255,255,0.05); 
 }
-.stripe-box.StripeElement--focus {
-    border-color: var(--primary);
-}
-.stripe-box.StripeElement--invalid {
-    border-color: var(--error);
-}
+.stripe-box.StripeElement--focus { border-color: var(--primary); }
+.stripe-box.StripeElement--invalid { border-color: var(--error); }
 
 .h-captcha-container { margin-bottom: 20px; display: flex; justify-content: center; }
 .error-msg { color: var(--error); font-weight: 700; text-align: center; margin-bottom: 15px; font-size: 0.9rem; }
@@ -220,73 +221,24 @@ footer { text-align: center; padding: 60px 20px; border-top: 1px solid var(--bor
     .glass-panel { padding: 40px 25px; }
     .dash-header h1 { font-size: 2.2rem; }
     
-    /* 1. Action Boxes: Scaled 1/9th & Side-by-Side */
-    .action-boxes { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 10px; 
-    }
-    .action-box { 
-        padding: 15px 5px; 
-        border-radius: 12px; 
-    }
-    .action-box h3 { 
-        font-size: 0.85rem; 
-        transform: translateZ(10px);
-    }
-    .action-icon { 
-        font-size: 1.6rem; 
-        margin-bottom: 5px; 
-        transform: translateZ(15px);
-    }
+    .action-boxes { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .action-box { padding: 15px 5px; border-radius: 12px; }
+    .action-box h3 { font-size: 0.85rem; transform: translateZ(10px); }
+    .action-icon { font-size: 1.6rem; margin-bottom: 5px; transform: translateZ(15px); }
 
-    /* 2. Stat Grid: Scaled & Side-by-Side */
-    .stat-grid { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 10px; 
-    }
-    .stat-card { 
-        padding: 15px 8px; 
-        border-radius: 12px; 
-    }
-    .stat-value { 
-        font-size: 1.2rem; 
-        margin: 5px 0; 
-    }
-    .stat-label { 
-        font-size: 0.55rem; 
-    }
-    .dash-action-btn { 
-        font-size: 0.5rem; 
-        padding: 6px 4px; 
-    }
-    .chart-box { 
-        height: 40px; 
-        margin: 8px 0; 
-        padding: 5px 0 0 5px;
-    }
-    .chart-legend { 
-        font-size: 0.5rem; 
-        gap: 4px; 
-        flex-wrap: wrap;
-    }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-card { padding: 15px 8px; border-radius: 12px; }
+    .stat-value { font-size: 1.2rem; margin: 5px 0; }
+    .stat-label { font-size: 0.55rem; }
+    .dash-action-btn { font-size: 0.5rem; padding: 6px 4px; }
+    .chart-box { height: 40px; margin: 8px 0; padding: 5px 0 0 5px; }
+    .chart-legend { font-size: 0.5rem; gap: 4px; flex-wrap: wrap; }
 
-    /* 3. Horizontal Scroll for Books */
     .book-grid { 
-        display: flex; 
-        flex-wrap: nowrap; 
-        overflow-x: auto; 
-        overflow-y: hidden;
-        scroll-snap-type: x mandatory; 
-        gap: 15px;
-        padding-bottom: 15px; 
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; 
+        display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+        scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 15px; 
+        -webkit-overflow-scrolling: touch; scrollbar-width: none; 
     }
-    .book-grid::-webkit-scrollbar { 
-        display: none; 
-    }
-    .book-card, .book-item { 
-        flex: 0 0 75%; 
-        scroll-snap-align: center; 
-    }
+    .book-grid::-webkit-scrollbar { display: none; }
+    .book-card, .book-item { flex: 0 0 75%; scroll-snap-align: center; }
 }
