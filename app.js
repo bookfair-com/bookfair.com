@@ -5,30 +5,32 @@ const UaaODatabase = {
         name: "Alekhyo Biswas",
         email: "alekhyo@example.com",
         phone: "+91 00000 00000",
+        address: "HQ",
         wallet: 1450,
         unsettledBooks: 4,
         inbox: 2
     }
 };
 
-// --- STRIPE SECURE PAYMENT INITIALIZATION ---
-// This is Stripe's universal test key. It is safe to be public!
+// --- STRIPE SECURE PAYMENT INITIALIZATION (SPLIT ELEMENTS) ---
 const stripe = Stripe('pk_test_TYooMQauvdEDq54NiTphI7jx'); 
 const elements = stripe.elements();
 
-// Create the secure UI component
-const cardElement = elements.create('card', {
-    style: {
-        base: {
-            iconColor: '#6366f1',
-            color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#0f172a',
-            fontFamily: '"Exo 2", sans-serif',
-            fontSize: '16px',
-            '::placeholder': { color: '#aab7c4' }
-        },
-        invalid: { color: '#ff4757', iconColor: '#ff4757' }
-    }
-});
+const elementStyles = {
+    base: {
+        iconColor: '#6366f1',
+        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8fafc' : '#0f172a',
+        fontFamily: '"Exo 2", sans-serif',
+        fontSize: '16px',
+        '::placeholder': { color: '#aab7c4' }
+    },
+    invalid: { color: '#ff4757', iconColor: '#ff4757' }
+};
+
+// Create the three separate components
+const cardNumber = elements.create('cardNumber', { style: elementStyles });
+const cardExpiry = elements.create('cardExpiry', { style: elementStyles });
+const cardCvc = elements.create('cardCvc', { style: elementStyles });
 
 // --- 1. STATE ROUTER & AUTHENTICATION ---
 const vLanding = document.getElementById('view-landing');
@@ -87,7 +89,11 @@ function showLanding() {
     document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
-    if(cardElement) cardElement.clear();
+    
+    cardNumber.clear();
+    cardExpiry.clear();
+    cardCvc.clear();
+    
     checkAuthState();
 }
 
@@ -97,12 +103,18 @@ function toggleAuthMode() {
     const toggleLink = document.getElementById('auth-toggle-link');
     const signupOnlyFields = document.querySelectorAll('.signup-only');
 
+    // List of inputs that require specific handling
+    const signupInputIds = ['fullname', 'email', 'phone', 'address1', 'city', 'state', 'zip'];
+
     authForm.reset();
     document.getElementById('auth-error').classList.add('hidden');
     document.getElementById('password').type = 'password'; 
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
-    if(cardElement) cardElement.clear();
+    
+    cardNumber.clear();
+    cardExpiry.clear();
+    cardCvc.clear();
 
     if (currentAuthMode === 'signup') {
         // Switch to LOGIN
@@ -111,11 +123,8 @@ function toggleAuthMode() {
         submitBtn.innerText = 'Log In';
         toggleLink.innerText = "Don't have an account? Sign Up";
         
-        // Hide expanded fields
         signupOnlyFields.forEach(el => el.classList.add('hidden'));
-        document.getElementById('fullname').removeAttribute('required');
-        document.getElementById('email').removeAttribute('required');
-        document.getElementById('phone').removeAttribute('required');
+        signupInputIds.forEach(id => document.getElementById(id).removeAttribute('required'));
     } else {
         // Switch to SIGNUP
         currentAuthMode = 'signup';
@@ -123,30 +132,21 @@ function toggleAuthMode() {
         submitBtn.innerText = 'Sign Up';
         toggleLink.innerText = "Already have an account? Log In";
         
-        // Show expanded fields
         signupOnlyFields.forEach(el => el.classList.remove('hidden'));
-        document.getElementById('fullname').setAttribute('required', 'true');
-        document.getElementById('email').setAttribute('required', 'true');
-        document.getElementById('phone').setAttribute('required', 'true');
+        signupInputIds.forEach(id => document.getElementById(id).setAttribute('required', 'true'));
     }
 }
 
 // --- OAUTH LOGIC SIMULATOR ---
 function triggerOAuth(provider) {
     const errorBox = document.getElementById('auth-error');
-    
-    // Aesthetic styling for the handshake simulation
     errorBox.style.color = "var(--primary)";
     errorBox.classList.remove('hidden');
-    
-    // Simulate the OAuth redirect sequence
     errorBox.innerText = `Requesting secure token from ${provider}...`;
     
     setTimeout(() => {
         errorBox.innerText = `Verifying ${provider} credentials...`;
-        
         setTimeout(() => {
-            // Create a simulated user profile in the UaaO Database
             const simulatedUid = `${provider.toLowerCase()}_user`;
             UaaODatabase[simulatedUid] = { 
                 pass: "oauth_token_bypass", 
@@ -158,9 +158,8 @@ function triggerOAuth(provider) {
                 inbox: 0 
             };
             
-            // Log the user in
             localStorage.setItem('bookfair_active_user', `${provider} User`);
-            errorBox.style.color = "var(--error)"; // reset color for next time
+            errorBox.style.color = "var(--error)"; 
             showLanding();
         }, 1000);
     }, 1000);
@@ -192,12 +191,21 @@ authForm.addEventListener('submit', function(e) {
     const pass = document.getElementById('password').value;
     const errorBox = document.getElementById('auth-error');
     const submitBtn = document.getElementById('auth-submit-btn');
-    errorBox.style.color = "var(--error)"; // Ensure standard red for errors
+    errorBox.style.color = "var(--error)"; 
 
     if (currentAuthMode === 'signup') {
         const fname = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
+        
+        // Grab the location data
+        const locationData = {
+            line1: document.getElementById('address1').value.trim(),
+            line2: document.getElementById('address2').value.trim(),
+            city: document.getElementById('city').value.trim(),
+            state: document.getElementById('state').value.trim(),
+            zip: document.getElementById('zip').value.trim()
+        };
         
         const captchaToken = hcaptcha.getResponse();
         
@@ -217,29 +225,33 @@ authForm.addEventListener('submit', function(e) {
         submitBtn.innerText = "Encrypting..."; 
         submitBtn.disabled = true;
 
-        // 1. Ask Stripe to tokenize the credit card FIRST
-        stripe.createToken(cardElement).then(function(result) {
+        // 1. Pass the location data along with the card number to Stripe for extra verification!
+        stripe.createToken(cardNumber, {
+            name: fname,
+            address_line1: locationData.line1,
+            address_line2: locationData.line2,
+            address_city: locationData.city,
+            address_state: locationData.state,
+            address_zip: locationData.zip
+        }).then(function(result) {
             if (result.error) {
-                // The user typed a bad card number
                 errorBox.innerText = result.error.message;
                 errorBox.classList.remove('hidden');
                 submitBtn.innerText = "Sign Up";
                 submitBtn.disabled = false;
                 hcaptcha.reset();
             } else {
-                // 2. Success! We got the secure token from Stripe!
                 const securePaymentToken = result.token.id;
-                console.log("SUCCESS! Stripe Token Generated:", securePaymentToken);
+                console.log("SUCCESS! Split-Stripe Token Generated:", securePaymentToken);
                 
-                // Simulate server communication latency
                 setTimeout(() => {
-                    // Save to UaaO Object (Notice we save the TOKEN, not the card number)
                     UaaODatabase[uid] = { 
                         pass: pass, 
                         name: fname, 
                         email: email,
                         phone: phone,
-                        stripeToken: securePaymentToken, // <--- Secured!
+                        address: `${locationData.line1}, ${locationData.city}`,
+                        stripeToken: securePaymentToken,
                         wallet: 0, 
                         unsettledBooks: 0, 
                         inbox: 0 
@@ -248,11 +260,15 @@ authForm.addEventListener('submit', function(e) {
                     localStorage.setItem('bookfair_active_user', fname);
                     
                     authForm.reset();
-                    cardElement.clear(); // Wipe the Stripe box
+                    cardNumber.clear();
+                    cardExpiry.clear();
+                    cardCvc.clear();
+                    
                     document.getElementById('password').type = 'password';
                     document.getElementById('eye-icon').classList.add('hidden');
                     document.getElementById('eye-slash-icon').classList.remove('hidden');
                     hcaptcha.reset(); 
+                    
                     submitBtn.innerText = "Sign Up";
                     submitBtn.disabled = false;
                     checkAuthState();
@@ -281,7 +297,11 @@ function signOut() {
     document.getElementById('password').type = 'password';
     document.getElementById('eye-icon').classList.add('hidden');
     document.getElementById('eye-slash-icon').classList.remove('hidden');
-    if(cardElement) cardElement.clear();
+    
+    cardNumber.clear();
+    cardExpiry.clear();
+    cardCvc.clear();
+    
     if (currentAuthMode === 'login') toggleAuthMode(); 
     checkAuthState();
 }
@@ -299,13 +319,12 @@ function toggleTheme() {
     }
     updateParticleColors();
     
-    // Update Stripe element styling to match theme
+    // Update all three Stripe elements to match theme
     const isDark = root.getAttribute('data-theme') === 'dark';
-    cardElement.update({
-        style: {
-            base: { color: isDark ? '#f8fafc' : '#0f172a' }
-        }
-    });
+    const newStyle = { style: { base: { color: isDark ? '#f8fafc' : '#0f172a' } } };
+    cardNumber.update(newStyle);
+    cardExpiry.update(newStyle);
+    cardCvc.update(newStyle);
 }
 
 // --- 3. 3D TILT & SCROLL OBSERVER ---
@@ -395,6 +414,8 @@ window.addEventListener('load', () => {
     canvas.height = window.innerHeight;
     checkAuthState(); 
     
-    // Mount Stripe Secure Element
-    cardElement.mount('#card-element');
+    // Mount all three Split Stripe Elements!
+    cardNumber.mount('#card-number');
+    cardExpiry.mount('#card-expiry');
+    cardCvc.mount('#card-cvc');
 });
