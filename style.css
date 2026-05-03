@@ -169,7 +169,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .stripe-box.StripeElement--focus { border-color: var(--primary); }
 .stripe-box.StripeElement--invalid { border-color: var(--error); }
 
-.h-captcha-container { margin-bottom: 20px; display: flex; justify-content: center; }
+.turnstile-container { margin-bottom: 20px; display: flex; justify-content: center; min-height: 65px; }
 .error-msg { color: var(--error); font-weight: 700; text-align: center; margin-bottom: 15px; font-size: 0.9rem; }
 
 .submit-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; transition: background 0.3s; }
