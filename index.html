@@ -8,7 +8,7 @@
     <!-- Secure hCaptcha & Stripe Scripts -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -91,6 +91,7 @@
                     <h2 id="auth-title">Create Account</h2>
                     
                     <div class="social-auth">
+                        <!-- All 5 Social Providers -->
                         <button type="button" class="social-btn" onclick="triggerOAuth('Google')">
                             <svg class="social-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                             Continue with Google
@@ -102,6 +103,14 @@
                         <button type="button" class="social-btn" onclick="triggerOAuth('Facebook')">
                             <svg class="social-icon" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                             Continue with Facebook
+                        </button>
+                        <button type="button" class="social-btn" onclick="triggerOAuth('Microsoft')">
+                            <svg class="social-icon" viewBox="0 0 21 21"><path d="M10 0H0v10h10V0zM21 0H11v10h10V0zM10 11H0v10h10V11zM21 11H11v10h10V11z" fill="#00a4ef"/></svg>
+                            Continue with Microsoft
+                        </button>
+                        <button type="button" class="social-btn" onclick="triggerOAuth('Yahoo')">
+                            <svg class="social-icon" viewBox="0 0 24 24" fill="#410093"><path d="M16.036 2.05L12.012 12 7.974 2.05H2.601l7.398 16.483v3.417h4.024v-3.417L21.399 2.05h-5.363z"/></svg>
+                            Continue with Yahoo
                         </button>
                     </div>
 
@@ -126,13 +135,11 @@
                             <input type="tel" id="phone" placeholder="+91 98765 43210">
                         </div>
 
-                        <!-- NEW: LOCATION DATA -->
+                        <!-- LOCATION DATA -->
                         <div class="input-group signup-only">
                             <label>Shipping Address</label>
                             <input type="text" id="address1" placeholder="Street Address" style="margin-bottom: 10px;">
                             <input type="text" id="address2" placeholder="Apt, Suite, Bldg (Optional)" style="margin-bottom: 10px;">
-                            
-                            <!-- Multi-column layout for City, State, ZIP -->
                             <div class="form-row">
                                 <input type="text" id="city" placeholder="City" class="form-col-2">
                                 <input type="text" id="state" placeholder="State" class="form-col">
@@ -140,19 +147,52 @@
                             </div>
                         </div>
                         
-                        <!-- REAL PAYMENT STRIPE ELEMENT (SPLIT) -->
+                        <!-- MULTI-PAYMENT ENGINE -->
                         <div class="input-group signup-only">
-                            <label>Payment Method (Secure Card)</label>
-                            <!-- Card Number -->
-                            <div id="card-number" class="stripe-box" style="margin-bottom: 10px;"></div>
+                            <label>Payment Method</label>
                             
-                            <!-- Expiry and CVC Side-by-Side -->
-                            <div class="form-row">
-                                <div id="card-expiry" class="stripe-box form-col"></div>
-                                <div id="card-cvc" class="stripe-box form-col"></div>
+                            <!-- Payment Tabs -->
+                            <div class="payment-tabs">
+                                <label class="pay-tab active">
+                                    <input type="radio" name="pay_method" value="card" checked> Card
+                                </label>
+                                <label class="pay-tab">
+                                    <input type="radio" name="pay_method" value="upi"> UPI
+                                </label>
+                                <label class="pay-tab">
+                                    <input type="radio" name="pay_method" value="netbanking"> NetBanking
+                                </label>
                             </div>
 
-                            <div id="card-errors" class="error-msg hidden" style="margin-top: 5px;"></div>
+                            <!-- 1. Card Section (Stripe) -->
+                            <div id="pay-card" class="pay-section">
+                                <div id="card-number" class="stripe-box" style="margin-bottom: 10px;"></div>
+                                <div class="form-row">
+                                    <div id="card-expiry" class="stripe-box form-col"></div>
+                                    <div id="card-cvc" class="stripe-box form-col"></div>
+                                </div>
+                                <div id="card-errors" class="error-msg hidden" style="margin-top: 5px;"></div>
+                            </div>
+
+                            <!-- 2. UPI Section -->
+                            <div id="pay-upi" class="pay-section hidden">
+                                <input type="text" id="upi-id" placeholder="username@bank" class="custom-pay-input">
+                                <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">A payment request will be sent to this UPI ID.</p>
+                            </div>
+
+                            <!-- 3. NetBanking Section -->
+                            <div id="pay-netbanking" class="pay-section hidden">
+                                <select id="bank-select" class="custom-pay-input">
+                                    <option value="" disabled selected>Select your Bank...</option>
+                                    <option value="sbi">State Bank of India (SBI)</option>
+                                    <option value="hdfc">HDFC Bank</option>
+                                    <option value="icici">ICICI Bank</option>
+                                    <option value="axis">Axis Bank</option>
+                                    <option value="kotak">Kotak Mahindra Bank</option>
+                                    <option value="pnb">Punjab National Bank</option>
+                                </select>
+                                <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">You will be redirected to your bank's portal.</p>
+                            </div>
                         </div>
                         <!-- END EXPANDED FIELDS -->
 
@@ -280,12 +320,12 @@
             </div>
 
             <footer>
-                (c) Alekhyo Biswas 2026
+                (c) Alekhyo Biswas – May 3, 2026
             </footer>
         </div>
     </div>
 
-    <!-- Added ?v=5 to force your phone to download the new app.js! -->
-    <script src="app.js?v=5"></script>
+    <!-- Added ?v=6 to force your phone to download the new app.js! -->
+    <script src="app.js?v=6"></script>
 </body>
 </html>
