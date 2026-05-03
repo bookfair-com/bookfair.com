@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookfair | Read & Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Secure hCaptcha & Stripe Scripts -->
     <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -102,14 +103,6 @@
                             <svg class="social-icon" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                             Continue with Facebook
                         </button>
-                        <button type="button" class="social-btn" onclick="triggerOAuth('Microsoft')">
-                            <svg class="social-icon" viewBox="0 0 21 21"><path d="M10 0H0v10h10V0zM21 0H11v10h10V0zM10 11H0v10h10V11zM21 11H11v10h10V11z" fill="#00a4ef"/></svg>
-                            Continue with Microsoft
-                        </button>
-                        <button type="button" class="social-btn" onclick="triggerOAuth('Yahoo')">
-                            <svg class="social-icon" viewBox="0 0 24 24" fill="#410093"><path d="M16.036 2.05L12.012 12 7.974 2.05H2.601l7.398 16.483v3.417h4.024v-3.417L21.399 2.05h-5.363z"/></svg>
-                            Continue with Yahoo
-                        </button>
                     </div>
 
                     <div class="divider">OR USE STANDARD LOGIN</div>
@@ -117,6 +110,7 @@
                     <form id="auth-form">
                         <div id="auth-error" class="error-msg hidden">Invalid details provided.</div>
                         
+                        <!-- EXPANDED SIGNUP FIELDS -->
                         <div class="input-group signup-only">
                             <label>Full Name</label>
                             <input type="text" id="fullname" placeholder="Enter your full name">
@@ -131,12 +125,37 @@
                             <label>Phone Number</label>
                             <input type="tel" id="phone" placeholder="+91 98765 43210">
                         </div>
-                        
+
+                        <!-- NEW: LOCATION DATA -->
                         <div class="input-group signup-only">
-                            <label>Payment Method (Secure)</label>
-                            <div id="card-element" class="stripe-box"></div>
+                            <label>Shipping Address</label>
+                            <input type="text" id="address1" placeholder="Street Address" style="margin-bottom: 10px;">
+                            <input type="text" id="address2" placeholder="Apt, Suite, Bldg (Optional)" style="margin-bottom: 10px;">
+                            
+                            <!-- Multi-column layout for City, State, ZIP -->
+                            <div class="form-row">
+                                <input type="text" id="city" placeholder="City" class="form-col-2">
+                                <input type="text" id="state" placeholder="State" class="form-col">
+                                <input type="text" id="zip" placeholder="ZIP" class="form-col">
+                            </div>
+                        </div>
+                        
+                        <!-- REAL PAYMENT STRIPE ELEMENT (SPLIT) -->
+                        <div class="input-group signup-only">
+                            <label>Payment Method (Secure Card)</label>
+                            <!-- Card Number -->
+                            <div id="card-number" class="stripe-box" style="margin-bottom: 10px;"></div>
+                            
+                            <!-- Expiry and CVC Side-by-Side -->
+                            <div class="form-row">
+                                <div id="card-expiry" class="stripe-box form-col"></div>
+                                <div id="card-cvc" class="stripe-box form-col"></div>
+                            </div>
+
                             <div id="card-errors" class="error-msg hidden" style="margin-top: 5px;"></div>
                         </div>
+                        <!-- END EXPANDED FIELDS -->
+
                         <div class="input-group">
                             <label>User ID</label>
                             <input type="text" id="userid" placeholder="Enter User ID" required>
@@ -261,11 +280,12 @@
             </div>
 
             <footer>
-                (c) Alekhyo Biswas April 29, 2026
+                (c) Alekhyo Biswas 2026
             </footer>
         </div>
     </div>
 
-    <script src="app.js?v=4"></script>
+    <!-- Added ?v=5 to force your phone to download the new app.js! -->
+    <script src="app.js?v=5"></script>
 </body>
 </html>
