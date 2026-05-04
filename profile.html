@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Bookfair</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=9">
+</head>
+<body>
+
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    
+    <!-- No particle canvas here to keep the profile page fast and clean -->
+
+    <div class="content-layer" id="profile-page-marker">
+        <div class="container">
+            
+            <nav>
+                <div class="brand-container">
+                    <a href="index.html" style="text-decoration: none;">
+                        <div class="logo">BOOKFAIR</div>
+                        <div class="tagline">Read & Return</div>
+                    </a>
+                </div>
+                <div class="nav-controls">
+                    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()">Dark Mode</button>
+                    <!-- Back to Home instead of Profile Avatar -->
+                    <a href="index.html" class="logout-btn" style="text-decoration: none;">Back to Dashboard</a>
+                </div>
+            </nav>
+
+            <div class="profile-wrapper">
+                <!-- Left Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="profile-big-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <h2 id="prof-fullname">Loading...</h2>
+                    <p id="prof-userid">@loading</p>
+                    
+                    <div style="margin-top: 30px;">
+                        <div style="font-size: 0.8rem; font-weight: 900; opacity: 0.6; text-transform: uppercase;">Current Wallet</div>
+                        <div style="font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 20px;" id="prof-wallet">₹0.00</div>
+                        
+                        <button class="auth-nav-btn" style="width: 100%; margin-bottom: 10px;">Withdraw Funds</button>
+                        <button class="logout-btn" style="width: 100%; border-color: var(--error); color: var(--error);" onclick="signOut()">Log Out of Bookfair</button>
+                    </div>
+                </div>
+
+                <!-- Right Detail Grid -->
+                <div class="profile-details">
+                    <div class="profile-section-title">Personal Information</div>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Email Address</label>
+                            <div id="prof-email">Not provided</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Phone Number</label>
+                            <div id="prof-phone">Not provided</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section-title">Shipping & Logistics</div>
+                    
+                    <div class="detail-grid" style="grid-template-columns: 1fr;">
+                        <div class="detail-item">
+                            <label>Primary Address</label>
+                            <div id="prof-address">Not provided</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section-title">Security & Billing</div>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Linked Payment Method</label>
+                            <div id="prof-payment" style="text-transform: capitalize;">None</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Account Status</label>
+                            <div style="color: #2ecc71;">Verified Active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                (c) Alekhyo Biswas 2026
+            </footer>
+        </div>
+    </div>
+
+    <script src="app.js?v=9"></script>
+</body>
+</html>
